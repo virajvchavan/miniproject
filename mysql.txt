@@ -1,0 +1,23 @@
+//This file contains all the MySQL queries used for this project
+
+
+1. //registering the user ( a trigger added to table 'users' so that the initial 500 points are added into the users account i.e. into the table 'balances_of_users')
+INSERT INTO users(name, username, password) VALUES('$name', '$username', '$password');
+
+
+2. //logging the user in
+//if number of rows returned eqauls 1, log the user in
+SELECT id FROM users WHERE username = '$username' AND password = '$password';
+
+
+3. //
+SELECT * FROM stock_prices, companies WHERE company_id = companies.id ORDER BY stock_prices.id DESC LIMIT 1
+
+
+
+
+//doubt
+when a new company is added, let's say the company is releasing 500 shares into the market. So to whom do these shares belong?
+suppose I want to buy 100 shares from that company, then to whom the money that I pay goes to?
+Or is it that the shares released at the begginng are owned by some user, so that we can add that money into that account
+

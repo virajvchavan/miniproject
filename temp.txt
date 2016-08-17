@@ -21,3 +21,22 @@ when a new company is added, let's say the company is releasing 500 shares into 
 suppose I want to buy 100 shares from that company, then to whom the money that I pay goes to?
 Or is it that the shares released at the begginng are owned by some user, so that we can add that money into that account
 
+
+
+Things to import for materialize
+//import google font
+<link href='css/gfonts.css' rel='stylesheet' type='text/css'>
+
+//import materialize.css
+
+//in head
+<link href='css/materialize.min.css' rel='stylesheet' type='text/css' media='screen, projection'>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+//at the end of body
+//import jquery then materailize.js
+<script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
+<script type="text/javascript" src="js/materialize.js"></script>
+

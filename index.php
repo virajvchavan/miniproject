@@ -3,12 +3,16 @@
     <head>
         <meta charset="utf-8">
         <title>The Game of Shares</title>
+		<link href='css/gfonts.css' rel='stylesheet' type='text/css'>
+		<link href='css/materialize.min.css' rel='stylesheet' type='text/css' media='screen, projection'>
+		<link href="css/index.css" rel="stylesheet" type="text/css">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
 	<script>
 	
 	</script>
 	
-<?php
+	<?php
 	include "conn.inc.php";
 
 	if(!isLoggedIn())
@@ -20,19 +24,74 @@
 		else
 			header("Location: login.php");
 	}
-	else
-	{
-		echo "<br><a href='logout.php'>Logout</a>($user_name)<br><hr><br>";
-	}
-	
-	
-	
-	
-	echo "Your Balance: $user_balance Points<br><br>";
-	
-	
-//showing all the companies data
+	?>
+	<body>
+		<nav class="navbar-fixed" id="nav">
+			<div class="nav-wrapper">
+				<a href="index.php" id="logo" class="brand-logo">The Game Of Shares</a>
+			
+			<ul id="nav-mobile" class="right hide-on-med-and-down">
+				<li><a href='transactions.php'>Your Orders</a></li>
+				<li><a href='logout.php'>Logout(<?php echo $user_name; ?>)</a></li>
+				
+			</ul>
 		
+			</div>
+		</nav>
+		<div class="container" id="container">
+	
+		<div class="row">
+	
+	<?php
+	
+	
+	echo "<div class='card-panel col s3 teal' id='balance'><div class='card-content white-text'> Balance: $user_balance Points</div></div>";
+	
+	
+//showing the shares owned by the user
+	echo "<div  class='card col s8 blue-grey darken-1' id='shares'>";
+	echo "<div class='card-content white-text'> <span class='card-title'>Your shares:</span><br>";
+	$query_get_users_shares = "SELECT companies.id, companies.name, companies.stock_price, shares_distribution.no_of_shares  FROM companies, shares_distribution WHERE companies.id = shares_distribution.company_id AND user_id = $user_id";
+	if($run_get_users_shares = mysqli_query($conn, $query_get_users_shares))
+	{
+		if(mysqli_num_rows($run_get_users_shares) >= 1)
+		{
+			echo "<table >
+							<thead>
+								<tr>
+									<th data-field='abbr'>Company</th>
+									<th data-field='name'>Quantity</th>
+									<th data-field='price'>Current Price</th>
+								</tr>
+							</thead>	<tbody>";
+			
+			while($array = mysqli_fetch_assoc($run_get_users_shares))
+			{
+				$share_name = $array['name'];
+				$share_price = $array['stock_price'];
+				$share_number = $array['no_of_shares'];
+				$company_id = $array['id'];
+				
+				echo "<tr>
+									<td><a href='company.php?id=$company_id'>$share_name</a></td>
+									<td> $share_number</a></td> <td>$share_price</td>
+								</tr>
+							";
+			
+			}
+			echo "</tbody>
+						</table>";
+		}
+		else
+		{
+			echo "You have no shares of any company.";
+		}
+	}
+	echo "</div></div>";
+	
+echo "</div>";
+	
+//showing all the companies data	
 
 $query_get_company_id = "SELECT * FROM companies";
 		
@@ -40,6 +99,14 @@ if($run_get_company_id = mysqli_query($conn, $query_get_company_id))
 	{
 		if(mysqli_num_rows($run_get_company_id) >= 1)
 		{
+			echo "<br><table class='striped'>
+							<thead>
+								<tr>
+									<th data-field='abbr'>Abbrevation</th>
+									<th data-field='name'>Name</th>
+									<th data-field='price'>Price</th>
+								</tr>
+							</thead>	<tbody>";
 			while($array = mysqli_fetch_assoc($run_get_company_id))
 			{
 				
@@ -53,9 +120,17 @@ if($run_get_company_id = mysqli_query($conn, $query_get_company_id))
 				//Now show all the data related to current $company_id
 				//take the latest value of the stock from 'stock_values' table: the max value of id from stock_prices where company_id = $company_id
 				
-				echo "<br><b>$company_abbr</b> (<a href='company.php?id=$company_id'> $company_name</a>) &nbsp;&nbsp;&nbsp;&nbsp;Share Price: $company_stock_price";
+				
+							
+						echo "<tr>
+									<td><b>$company_abbr</b></td>
+									<td><a href='company.php?id=$company_id'> $company_name</a></td> <td>$company_stock_price</td>
+								</tr>
+							";
 										
 			}
+			echo "</tbody>
+						</table>";
 		}
 		else
 		{
@@ -65,13 +140,20 @@ if($run_get_company_id = mysqli_query($conn, $query_get_company_id))
 }
 	?>
 	
-	<br><h4>Place an order: </h4>
-	<form action="order.php" method="post">
-		<input type="radio" name="order" value="buy" checked required>Buy
-		&nbsp;&nbsp;&nbsp;&nbsp;
-		<input type="radio" name="order" value="female" required>Sell<br><br>
-	Select Stock:
-		<select name='company' required>
+	<br>
+			<div class="card">
+				<div class="card-content"><h4>Place an order: </h4>
+	<form class="col s12" action="order.php" method="post">
+		<input type="radio" name="order" id="order1" value="buy" checked required>
+		<label for="order1">Buy</label>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="radio" name="order" id="order2" value="sell" required>
+		<label for="order2">Sell</label><br><br>
+		
+	
+		<div class="input-field col s12">
+		<select class="browser-default" name='company' required>
+			<option value="" disabled selected>Chhose a company</option>
 			<?php
 			
 			//get company data
@@ -90,7 +172,7 @@ if($run_get_company_id = mysqli_query($conn, $query_get_company_id))
 							$company_abbr = $array['abbrivation'];
 							$company_stock_price = $array['stock_price'];
 
-							echo "<option value='$company_id'><b>$company_abbr</b> ($company_stock_price points)</option>";
+							echo "<option value='$company_id'><b>$company_abbr</b><span class='badge'> $company_stock_price points</span></option>";
 								
 						}
 					}
@@ -98,14 +180,33 @@ if($run_get_company_id = mysqli_query($conn, $query_get_company_id))
 			
 			?>			
 		</select>
+			
+		</div>
+		<br>
+		<div class="input-field col s6">
+			<input class="validate" placeholder="Enter the number of shares" type="number" name="shares" required>
+		</div>
 		
-		<br><br>Number of Shares: <input type="number" name="shares" required>
-		<br><br><input type="radio" required onclick="deactivate()" name="type" id='type' value="market" checked>Market Price
-		 &nbsp;&nbsp;&nbsp;&nbsp;
-		<input type="radio" onclick="activate()" name="type" value="limit">Limit &nbsp;&nbsp;&nbsp;
-		<input type="number" id="limit_price" name="limit_price"><br><br>
-		<input type="submit" value="Place Order">
+		<br>
+		
+		<div class="row">
+			
+			<input class="col s4" type="radio" onclick="deactivate()" name="type" id='type1' checked value="market">
+			<label for="type1">Market Price</label>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			
+			<input class="col s4" type="radio" onclick="activate()" name="type" id="type2" value="limit">
+		
+			<label for="type2">Limit Price  <input class="col s4" type="number" id="limit_price" name="limit_price"></label>
+
+			
+		</div>	
+		<br><br>
+		<input type="submit" class="btn" value="Place Order">
+		
 	</form>
+					</div>
+		
 	
 
 	
@@ -196,7 +297,12 @@ if(isset($_POST['name_reg']) && isset($_POST['email_reg']) && isset($_POST['pass
 
 	
 ?>
+			</div>
+		<script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
+		<script type="text/javascript" src="js/materialize.js"></script>
+
+	</body>
 	
 </html>
-	
+
 	

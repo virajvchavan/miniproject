@@ -2,7 +2,11 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>The Game of Shares</title>
+        <title>Login | The Game of Shares</title>
+		<link href='css/gfonts.css' rel='stylesheet' type='text/css'>
+		<link href='css/materialize.min.css' rel='stylesheet' type='text/css' media='screen, projection'>
+		<link href="css/login.css" rel="stylesheet" type="text/css">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
 	
 
@@ -17,17 +21,42 @@
 ?>
 		
 	<body>
-		<a href='register.php'>Register</a>&nbsp;&nbsp;&nbsp;
 		
-		<a href='admin.php'> Admin Login</a>
-		<br><br>
-		<form action='login.php' method='post'> 
-			Email: <input type='email' name='email_login' required><br>Password:<input type='password' name='password_login' required><br><input type='submit' value='Login'>
-		</form>
-		<br><br>
+		<nav class="navbar-fixed">
+			<div class="nav-wrapper">
+				<a href="index.php" class="brand-logo">The Game Of Shares</a>
+			
+			<ul id="nav-mobile" class="right hide-on-med-and-down">
+				<li><a href='register.php'>Register</a></li>
+				<li><a href='admin.php'> Admin Login</a></li>
+			</ul>
 		
-	</body>
-</html>
+			</div>
+		</nav>
+		<div class="container">
+			<div id="main"  class="card col s12 teal darken-2 ">
+				
+				<form action='login.php' method='post'> 
+					<div class="row">
+						<div class="input-field col s6">	
+							<input class="validate" placeholder="example@email.com" type='email' id="email" name='email_login' required>
+							<label for="email">Email</label>
+						</div>
+					</div>
+					<div class="row">
+						<div class="input-field col s6">	
+							<input class="validate"  type='password' id="password" name='password_login' required>
+							<label for="password">Password</label>
+						</div>
+						
+					</div>
+					<input type='submit' class="btn" value='Login'>
+				</form>
+			
+		</div>
+			
+		
+		
 
 <?php
 //log in the user if email and pass match with database
@@ -58,3 +87,12 @@ if(isset($_POST['email_login']) && isset($_POST['password_login']))
 	}
 }
 ?>
+		
+		
+		</div>
+		<script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
+		<script type="text/javascript" src="js/materialize.js"></script>
+
+	</body>
+	
+</html>

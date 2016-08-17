@@ -2,31 +2,51 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>The Game of Shares</title>
+        <title>Admin | The Game of Shares</title>
+		<link href='css/materialize.min.css' rel='stylesheet' type='text/css' media='screen, projection'>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
 	<body>
+		<nav class="navbar-fixed" id="nav">
+			<div class="nav-wrapper">
+				<a href="index.php" id="logo" class="brand-logo">The Game Of Shares</a>
+			
+			<ul id="nav-mobile" class="right">
+				<?php 
+				
+				include "conn.inc.php";
+				if(isset($_SESSION['admin_name']) && !empty($_SESSION['admin_name']))
+				{
+					echo "<li><a href='newcompany.php'> Add a new company</a></li>";
+					echo "<li><a href='edit.php?changeprice='>Change the stock prices</a></li>";
+					echo "<li><a href='logout.php'>Logout</a></li>";
+				}
+				else
+					echo "<li><a href='login.php'>User Login</a></li>";
+				?>
+			</ul>
+		
+			</div>
+		</nav>
+		<div class="container">
 
 <?php
-include "conn.inc.php";
+
 
 if(!isset($_SESSION['admin_name']) || empty($_SESSION['admin_name']))
 {
 	
-	echo "<br><hr>Admin Login:<br>
+	echo "<br><h5>Admin Login:</h5><br><br>
 		<form action='admin.php' method='post'> 
-			Username: <input type='text' name='username_admin' required><br>Password:<input type='password' name='password_admin' required><input type='submit' value='Login'>
+			Username: <input type='text' name='username_admin' required><br>Password:<input type='password' name='password_admin' required>
+			<input class='btn' type='submit' value='Login'>
 		</form>";
 	
 }
 else
 {
-	echo "<br><a href='logout.php'>Logout</a>";
 	
-	echo "<br><a href='newcompany.php'> Add a new company.</a><br><br>";
-
-	echo "<br><a href='edit.php?changeprice='>Change the stock prices</a><br><br>";
-	
-	
+//this block executes only if admin is logged in	
 		
 //showing all the companies data
 		
@@ -37,6 +57,14 @@ if($run_get_company_id = mysqli_query($conn, $query_get_company_id))
 	{
 		if(mysqli_num_rows($run_get_company_id) >= 1)
 		{
+			echo "<br><table class='striped'>
+							<thead>
+								<tr>
+									<th data-field='abbr'>Abbrevation</th>
+									<th data-field='name'>Name</th>
+									<th data-field='price'>Price</th>
+								</tr>
+							</thead>	<tbody>";
 			while($array = mysqli_fetch_assoc($run_get_company_id))
 			{
 				
@@ -50,9 +78,15 @@ if($run_get_company_id = mysqli_query($conn, $query_get_company_id))
 				//Now show all the data related to current $company_id
 				//take the latest value of the stock from 'stock_values' table: the max value of id from stock_prices where company_id = $company_id
 				
-				echo "<br><b>$company_abbr</b> <a href='company.php?id=$company_id'> $company_name</a> &nbsp;&nbsp;&nbsp;&nbsp;Share Price: $company_stock_price&nbsp;&nbsp;&nbsp;&nbsp;Total Shares: $company_no_shares";
+				echo "<tr>
+									<td><b>$company_abbr</b></td>
+									<td><a href='company.php?id=$company_id'> $company_name</a></td> <td>$company_stock_price</td>
+								</tr>
+							";
 										
 			}
+			echo "</tbody>
+						</table>";
 		}
 		else
 		{
@@ -65,8 +99,7 @@ if($run_get_company_id = mysqli_query($conn, $query_get_company_id))
 
 ?>
 		
-	</body>
-</html>
+
 
 <?php
 //Adding a new company (That means:
@@ -199,3 +232,12 @@ if(isset($_POST['username_admin']) && isset($_POST['password_admin']))
 
 
 ?>
+		
+		
+		</div>
+		<script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
+		<script type="text/javascript" src="js/materialize.js"></script>
+
+	</body>
+	
+</html>

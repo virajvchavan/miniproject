@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <title>The Game of Shares</title>
 		<link href='css/materialize.min.css' rel='stylesheet' type='text/css' media='screen, projection'>
+		<link href="css/custom.css" rel="stylesheet" type="text/css">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
 	
@@ -19,7 +20,8 @@
 	
 	?>
 	<body>
-		<nav class="navbar-fixed" id="nav">
+		<div class="navbar-fixed">
+		<nav id="nav">
 			<div class="nav-wrapper">
 				<a href="index.php" id="logo" class="brand-logo">The Game Of Shares</a>
 			
@@ -39,7 +41,8 @@
 		
 			</div>
 		</nav>
-		<div class="container">
+		</div>
+		<div class="container" id="container">
 	<h3>Enter Company Details</h3><br>
 		<form name="register" action="admin.php" onsubmit="return validateForm()" method="post" role="form">
 			Name: <input type="text" id="company_name" name="company_name" required><br>

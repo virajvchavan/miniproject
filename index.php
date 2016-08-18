@@ -5,6 +5,7 @@
         <title>The Game of Shares</title>
 		<link href='css/gfonts.css' rel='stylesheet' type='text/css'>
 		<link href='css/materialize.min.css' rel='stylesheet' type='text/css' media='screen, projection'>
+		<link href="css/custom.css" rel="stylesheet" type="text/css">
 		<link href="css/index.css" rel="stylesheet" type="text/css">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
@@ -26,11 +27,12 @@
 	}
 	?>
 	<body>
-		<nav class="navbar-fixed" id="nav">
+		<div class="navbar-fixed">
+		<nav id="nav">
 			<div class="nav-wrapper">
 				<a href="index.php" id="logo" class="brand-logo">The Game Of Shares</a>
 			
-			<ul id="nav-mobile" class="right hide-on-med-and-down">
+			<ul id="nav-mobile" class="right">
 				<li><a href='transactions.php'>Your Orders</a></li>
 				<li><a href='logout.php'>Logout(<?php echo $user_name; ?>)</a></li>
 				
@@ -38,6 +40,7 @@
 		
 			</div>
 		</nav>
+			</div>
 		<div class="container" id="container">
 	
 		<div class="row">

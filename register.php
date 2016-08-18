@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <title>Register</title>
 		<link href='css/materialize.min.css' rel='stylesheet' type='text/css' media='screen, projection'>
+		<link href="css/custom.css" rel="stylesheet" type="text/css">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
 	
@@ -24,8 +25,8 @@
 </script>
 	
 	<body>
-		
-		<nav class="navbar-fixed" id="nav">
+		<div class="navbar-fixed">
+		<nav id="nav">
 			<div class="nav-wrapper">
 				<a href="index.php" id="logo" class="brand-logo">The Game Of Shares</a>
 			
@@ -35,7 +36,8 @@
 		
 			</div>
 		</nav>
-		<div class="container">
+		</div>
+		<div class="container" id="container">
 		<h3>Register</h3>
 		<form name="register" action="index.php" onsubmit="return validateForm()" method="post" role="form">
 			Name: <input type="text" id="name_reg" name="name_reg" required><br>

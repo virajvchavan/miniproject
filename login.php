@@ -5,6 +5,7 @@
         <title>Login | The Game of Shares</title>
 		<link href='css/gfonts.css' rel='stylesheet' type='text/css'>
 		<link href='css/materialize.min.css' rel='stylesheet' type='text/css' media='screen, projection'>
+		<link href="css/custom.css" rel="stylesheet" type="text/css">
 		<link href="css/login.css" rel="stylesheet" type="text/css">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
@@ -21,18 +22,19 @@
 ?>
 		
 	<body>
-		
-		<nav class="navbar-fixed">
+		<div class="navbar-fixed">
+		<nav>
 			<div class="nav-wrapper">
-				<a href="index.php" class="brand-logo">The Game Of Shares</a>
+				<a href="index.php" id="logo" class="brand-logo">The Game Of Shares</a>
 			
-			<ul id="nav-mobile" class="right hide-on-med-and-down">
+			<ul id="nav-mobile" class="right ">
 				<li><a href='register.php'>Register</a></li>
 				<li><a href='admin.php'> Admin Login</a></li>
 			</ul>
 		
 			</div>
 		</nav>
+		</div>
 		<div class="container">
 			<div id="main"  class="card col s12 teal darken-2 ">
 				

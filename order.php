@@ -4,14 +4,41 @@
         <meta charset="utf-8">
         <title>The Game of Shares</title>
 		<link href='css/materialize.min.css' rel='stylesheet' type='text/css' media='screen, projection'>
+		<link href="css/custom.css" rel="stylesheet" type="text/css">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
 	<?php
 	include "conn.inc.php";
+	
+	if(!isLoggedIn())
+	{
+		if(isset($_SESSION['admin_name']) && !empty($_SESSION['admin_name']))
+		{
+			header("Location: admin.php");
+		}
+		else
+			header("Location: login.php");
+	}
 	?>
 	<body>
+		
+		<body>
+			<div class="navbar-fixed">
+		<nav id="nav">
+			<div class="nav-wrapper">
+				<a href="index.php" id="logo" class="brand-logo">The Game Of Shares</a>
+			
+			<ul id="nav-mobile" class="right">
+				<li><a href='transactions.php'>Your Orders</a></li>
+				<li><a href='logout.php'>Logout(<?php echo $user_name; ?>)</a></li>
+				
+			</ul>
+		
+			</div>
+		</nav>
+			</div>
 
-
+			<div class="container">
 <?php
 
 
@@ -61,20 +88,31 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 	}
 	
 	
-	
+	echo "<br>";
 	
 	$query_place_order = "INSERT INTO $table_name(company_id, user_id, no_of_shares, price) VALUES('$company_id','$user_id','$no_of_shares','$price')";
 	if(mysqli_query($conn, $query_place_order))
 		{
 			//success;
-			echo "Successfully added into orders table";
+			echo "<div class='card'><div class='card-content'> Your order is placed. Visit <a href='transactions.php'>My Orders</a> to know the staus.</div></div>";
 		}
 	else
 		echo "Errror";
 }
+			
+else
+{
+	if(isset($_SESSION['admin_name']) && !empty($_SESSION['admin_name']))
+	{
+		header("Location: admin.php");
+	}
+	else
+		header("Location: login.php");
+}
+			
 ?>
 		
-		
+		</div>
 		<script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
 		<script type="text/javascript" src="js/materialize.js"></script>
 

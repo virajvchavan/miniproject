@@ -54,10 +54,12 @@
 //showing the shares owned by the user
 	echo "<div  class='card col s8 blue-grey darken-1' id='shares'>";
 	echo "<div class='card-content white-text'> <span class='card-title'>Your shares:</span><br>";
-	$query_get_users_shares = "SELECT companies.id, companies.name, companies.stock_price, shares_distribution.no_of_shares  FROM companies, shares_distribution WHERE companies.id = shares_distribution.company_id AND user_id = $user_id";
-	if($run_get_users_shares = mysqli_query($conn, $query_get_users_shares))
+	
+			
+	$query_get_company_id = "SELECT DISTINCT company_id FROM shares_distribution WHERE user_id = $user_id";
+	if($run_get_company_id = mysqli_query($conn, $query_get_company_id))
 	{
-		if(mysqli_num_rows($run_get_users_shares) >= 1)
+		if(mysqli_num_rows($run_get_company_id) >= 1)
 		{
 			echo "<table >
 							<thead>
@@ -68,18 +70,33 @@
 								</tr>
 							</thead>	<tbody>";
 			
-			while($array = mysqli_fetch_assoc($run_get_users_shares))
+			while($array = mysqli_fetch_assoc($run_get_company_id))
 			{
-				$share_name = $array['name'];
-				$share_price = $array['stock_price'];
-				$share_number = $array['no_of_shares'];
-				$company_id = $array['id'];
 				
-				echo "<tr>
+				$company_id = $array['company_id'];
+				
+				$query_get_users_shares = "SELECT companies.name, companies.stock_price, SUM(shares_distribution.no_of_shares) AS sum FROM companies, shares_distribution WHERE companies.id = shares_distribution.company_id AND user_id = $user_id AND company_id = $company_id";
+				if($run_get_users_shares = mysqli_query($conn, $query_get_users_shares))
+				{
+					if(mysqli_num_rows($run_get_users_shares) >= 1)
+					{
+						while($array_shares = mysqli_fetch_assoc($run_get_users_shares))
+						{
+
+							$share_name = $array_shares['name'];
+							$share_price = $array_shares['stock_price'];
+							$share_number = $array_shares['sum'];
+							
+							
+							echo "<tr>
 									<td><a href='company.php?id=$company_id'>$share_name</a></td>
 									<td> $share_number</a></td> <td>$share_price</td>
 								</tr>
 							";
+						}
+					}
+				}
+
 			
 			}
 			echo "</tbody>
@@ -94,57 +111,11 @@
 	
 echo "</div>";
 	
-//showing all the companies data	
-
-$query_get_company_id = "SELECT * FROM companies";
-		
-if($run_get_company_id = mysqli_query($conn, $query_get_company_id))
-	{
-		if(mysqli_num_rows($run_get_company_id) >= 1)
-		{
-			echo "<br><table class='striped'>
-							<thead>
-								<tr>
-									<th data-field='abbr'>Abbrevation</th>
-									<th data-field='name'>Name</th>
-									<th data-field='price'>Price</th>
-								</tr>
-							</thead>	<tbody>";
-			while($array = mysqli_fetch_assoc($run_get_company_id))
-			{
-				
-				$company_id = $array['id'];
-				$company_name = $array['name'];
-				$company_abbr = $array['abbrivation'];
-				$company_description = $array['description'];
-				$company_no_shares = $array['total_shares'];
-				$company_stock_price = $array['stock_price'];
-
-				//Now show all the data related to current $company_id
-				//take the latest value of the stock from 'stock_values' table: the max value of id from stock_prices where company_id = $company_id
-				
-				
-							
-						echo "<tr>
-									<td><b>$company_abbr</b></td>
-									<td><a href='company.php?id=$company_id'> $company_name</a></td> <td>$company_stock_price</td>
-								</tr>
-							";
-										
-			}
-			echo "</tbody>
-						</table>";
-		}
-		else
-		{
-			echo "<br>No companies exist.<br>";
-		}
-		
-}
+echo "<div class='row'>";
+			
 	?>
-	
 	<br>
-			<div class="card">
+			<div class="card col s7" id="order_card">
 				<div class="card-content"><h4>Place an order: </h4>
 	<form class="col s12" action="order.php" method="post">
 		<input type="radio" name="order" id="order1" value="buy" checked required>
@@ -156,7 +127,7 @@ if($run_get_company_id = mysqli_query($conn, $query_get_company_id))
 	
 		<div class="input-field col s12">
 		<select class="browser-default" name='company' required>
-			<option value="" disabled selected>Chhose a company</option>
+			<option value="" disabled selected>Chose a company</option>
 			<?php
 			
 			//get company data
@@ -208,7 +179,60 @@ if($run_get_company_id = mysqli_query($conn, $query_get_company_id))
 		<input type="submit" class="btn" value="Place Order">
 		
 	</form>
+					
 					</div>
+			</div>
+
+<?php
+//showing all the companies data	
+$query_get_company_id = "SELECT * FROM companies";
+		
+if($run_get_company_id = mysqli_query($conn, $query_get_company_id))
+	{
+		if(mysqli_num_rows($run_get_company_id) >= 1)
+		{
+			echo "<div class='card col s4' id='price_card'><table class='striped'>
+							<thead>
+								<tr>
+									<th data-field='abbr'>Abbrevation</th>
+									<th data-field='name'>Name</th>
+									<th data-field='price'>Price</th>
+								</tr>
+							</thead>	<tbody>";
+			while($array = mysqli_fetch_assoc($run_get_company_id))
+			{
+				
+				$company_id = $array['id'];
+				$company_name = $array['name'];
+				$company_abbr = $array['abbrivation'];
+				$company_description = $array['description'];
+				$company_no_shares = $array['total_shares'];
+				$company_stock_price = $array['stock_price'];
+
+				//Now show all the data related to current $company_id
+				//take the latest value of the stock from 'stock_values' table: the max value of id from stock_prices where company_id = $company_id
+				
+				
+							
+						echo "<tr>
+									<td><b>$company_abbr</b></td>
+									<td><a href='company.php?id=$company_id'> $company_name</a></td> <td>$company_stock_price</td>
+								</tr>
+							";
+										
+			}
+			echo "</tbody>
+						</table></div>";
+		}
+		else
+		{
+			echo "<br>No companies exist.<br>";
+		}
+		
+}
+	?>
+			
+			</div>
 		
 	
 
@@ -236,7 +260,7 @@ if(isset($_POST['name_reg']) && isset($_POST['email_reg']) && isset($_POST['pass
 	{
 		if(mysqli_num_rows($run) >= 1)
 		{
-			echo "Email already registered.";
+			echo "<script>alert('Email already registered.');</script>";
 			$ok = false;
 		}
 	}

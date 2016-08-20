@@ -36,7 +36,7 @@
 		</nav>
 		</div>
 		<div class="container">
-			<div id="main"  class="card col s12 teal darken-2 ">
+			<div id="main">
 				
 				<form action='login.php' method='post'> 
 					<div class="row">

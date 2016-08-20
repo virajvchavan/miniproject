@@ -38,7 +38,9 @@
 		<div class="container" id="container">
 	
 		<h3>Order Book</h3><br>
-			<table class="bordered">
+			<div class="card">
+				<div class="card-content">
+			<table class="striped">
 				<thead>
 					<tr>
 						<th>Time</th>
@@ -165,11 +167,14 @@
 					?>
 				</tbody>
 			</table>
+			</div>
+				</div>
 			
 			<br><br><br>
 			<h3>Trade Book</h3>
-			
-			<table class="bordered">
+			<div class="card">
+			<div class="card-content">
+			<table class="striped">
 				<thead>
 					<tr>
 						<th>Time</th>
@@ -238,6 +243,8 @@
 			
 				</tbody>
 			</table>
+				</div>
+			</div>
 			<br>
 		</div>
 	<script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>

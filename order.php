@@ -274,7 +274,6 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								exit();
 							}
 
-						//now set the market price of the company
 
 					}
 					//if order is partially executed, insert the order into the buying_orders table
@@ -538,19 +537,26 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 	
 	
 	//change the price of the share in companies table
-	$query_update_price = "UPDATE companies SET stock_price = $market_price WHERE company_id = $company_id";
+	$query_update_price = "UPDATE companies SET stock_price = $market_price WHERE id = $company_id";
 	
 	
 	//insert into stock_prices table
 	$query_insert_price = "INSERT INTO stock_prices(company_id, stock_price) VALUES($company_id, $market_price)";
 	
-	if(mysqli_query($query_update_price) && mysqli_query($query_insert_price))
+	if(mysqli_query($conn, $query_update_price)) 
 	{
-		echo "Changed the price of share<br>";
+		echo "Changed the price of share 1<br>";
 	}
 	else
-		echo "Failed to change the price of share<br>";
+		echo "Failed to change the price of share 1<br>";
 	
+    if(mysqli_query($conn, $query_insert_price))
+    {
+         echo "Changed the price of share 2<br>";
+    }
+    else
+        echo "Failed to change the price of share 2<br>";
+    
 }
 else
 {

@@ -6,6 +6,21 @@
 		<link href='css/materialize.min.css' rel='stylesheet' type='text/css' media='screen, projection'>
 		<link href="css/custom.css" rel="stylesheet" type="text/css">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        <script>
+			function deleteOrder()
+				{
+					
+					var ask = confirm('Sure to delete?');
+					if(ask != true)
+					{
+						return false;
+					}
+				}
+				
+		
+    </script>
     </head>
 	<body>
 		<div class="navbar-fixed">
@@ -84,6 +99,11 @@ if($run_get_company_id = mysqli_query($conn, $query_get_company_id))
 				echo "<tr>
 									<td><b>$company_abbr</b></td>
 									<td><a href='company.php?id=$company_id'> $company_name</a></td> <td>$company_stock_price</td>
+                                    <td>
+                                        <form action='delete.php?cid=$company_id' onsubmit='return deleteOrder()' method='post'>
+							             <input type='submit' value='Delete' id='red'>
+						                </form>
+                                    </td>
 								</tr>
 							";
 										

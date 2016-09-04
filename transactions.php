@@ -6,6 +6,21 @@
 		<link href='css/materialize.min.css' rel='stylesheet' type='text/css' media='screen, projection'>
 		<link href="css/custom.css" rel="stylesheet" type="text/css">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+           <script>
+			function deleteOrder()
+				{
+					
+					var ask = confirm('Sure to delete?');
+					if(ask != true)
+					{
+						return false;
+					}
+				}
+				
+		
+    </script>
     </head>
 	<?php
 	include "conn.inc.php";
@@ -20,6 +35,9 @@
 			header("Location: login.php");
 	}
 	?>
+    
+ 
+	
 	<body>
 		<div class="navbar-fixed">
 		<nav id="nav">
@@ -56,7 +74,7 @@
 					
 					<?php
 					
-					$query_order_book_sell = "SELECT selling_orders.price, selling_orders.no_of_shares, selling_orders.time, companies.abbrivation FROM  selling_orders, companies WHERE selling_orders.company_id = companies.id AND selling_orders.user_id = $user_id ORDER BY selling_orders.id DESC";
+					$query_order_book_sell = "SELECT selling_orders.id, selling_orders.price, selling_orders.no_of_shares, selling_orders.time, companies.abbrivation FROM  selling_orders, companies WHERE selling_orders.company_id = companies.id AND selling_orders.user_id = $user_id ORDER BY selling_orders.id DESC";
 					
 					if($run_sells = mysqli_query($conn, $query_order_book_sell))
 					{
@@ -68,6 +86,7 @@
 								$price = $array_sells['price'];
 								$quantity = $array_sells['no_of_shares'];
 								$abbr = $array_sells['abbrivation'];
+                                $order_id = $array_sells['id'];
 								
 								echo "<tr>
 										<td>$time</td>
@@ -76,6 +95,10 @@
 										<td>$quantity</td>
 										<td>$price</td>
 										<td><span id='yellow'>Pending</span></td>
+                                        <td>
+                                        <form action='delete.php?sid=$order_id' onsubmit='return deleteOrder()' method='post'>
+							             <input type='submit' value='Cancel' id='red'>
+						                </form></td>
 									  </tr>";
 							}
 						}
@@ -83,7 +106,7 @@
 					}
 					
 					
-					$query_order_book_buy = "SELECT buying_orders.price, buying_orders.no_of_shares, buying_orders.time, companies.abbrivation FROM  buying_orders, companies WHERE buying_orders.company_id = companies.id AND buying_orders.user_id = $user_id ORDER BY buying_orders.id DESC";
+					$query_order_book_buy = "SELECT buying_orders.id, buying_orders.price, buying_orders.no_of_shares, buying_orders.time, companies.abbrivation FROM  buying_orders, companies WHERE buying_orders.company_id = companies.id AND buying_orders.user_id = $user_id ORDER BY buying_orders.id DESC";
 					
 					if($run_buys = mysqli_query($conn, $query_order_book_buy))
 					{
@@ -95,6 +118,7 @@
 								$price = $array_sells['price'];
 								$quantity = $array_sells['no_of_shares'];
 								$abbr = $array_sells['abbrivation'];
+                                $order_id = $array_sells['id'];
 								
 								echo "<tr>
 										<td>$time</td>
@@ -103,64 +127,17 @@
 										<td>$quantity</td>
 										<td>$price</td>
 										<td><span id='yellow'>Pending</span></td>
+                                        <td>
+                                        <form action='delete.php?bid=$order_id' onsubmit='return deleteOrder()' method='post'>
+							             <input type='submit' value='Cancel' id='red'>
+						                </form>
+                                        </td>
 									  </tr>";
 							}
 						}
 					
 					}
 					
-					//executed sells
-					$query_trans_sells = "SELECT transactions.time, transactions.no_of_shares, transactions.price, companies.abbrivation FROM transactions, companies WHERE transactions.company_id = companies.id AND transactions.seller_id = $user_id ORDER BY transactions.id DESC";
-					if($run_sells_trans = mysqli_query($conn, $query_trans_sells))
-					{
-						if(mysqli_num_rows($run_sells_trans) >= 1)
-						{
-							while($array_sells_trans = mysqli_fetch_assoc($run_sells_trans))
-							{
-								$time = $array_sells_trans['time'];
-								$price = $array_sells_trans['price'];
-								$quantity = $array_sells_trans['no_of_shares'];
-								$abbr = $array_sells_trans['abbrivation'];
-								
-								echo "<tr>
-										<td>$time</td>
-										<td>Sell</td>
-										<td>$abbr</td>
-										<td>$quantity</td>
-										<td>$price</td>
-										<td><span id='green'>Executed</span></td>
-									  </tr>";
-							}
-						}
-					
-					}
-					
-					
-					//executed sells
-					$query_trans_buys = "SELECT transactions.time, transactions.no_of_shares, transactions.price, companies.abbrivation FROM transactions, companies WHERE transactions.company_id = companies.id AND transactions.buyer_id = $user_id ORDER BY transactions.id DESC";
-					if($run_buys_trans = mysqli_query($conn, $query_trans_buys))
-					{
-						if(mysqli_num_rows($run_buys_trans) >= 1)
-						{
-							while($array_buys_trans = mysqli_fetch_assoc($run_buys_trans))
-							{
-								$time = $array_buys_trans['time'];
-								$price = $array_buys_trans['price'];
-								$quantity = $array_buys_trans['no_of_shares'];
-								$abbr = $array_buys_trans['abbrivation'];
-								
-								echo "<tr>
-										<td>$time</td>
-										<td>Buy</td>
-										<td>$abbr</td>
-										<td>$quantity</td>
-										<td>$price</td>
-										<td><span id='green'>Executed</span></td>
-									  </tr>";
-							}
-						}
-					
-					}
 					
 					
 					

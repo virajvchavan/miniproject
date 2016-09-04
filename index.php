@@ -116,7 +116,7 @@ echo "<div class='row'>";
 	?>
 	<br>
 			<div class="card col s7" id="order_card">
-				<div class="card-content"><h4>Place an order: </h4>
+				<div class="card-content"><h4>Place an order: </h4><hr><br><br>
 	<form class="col s12" action="order.php" method="post">
 		<input type="radio" name="order" id="order1" value="buy" checked required>
 		<label for="order1">Buy</label>
@@ -126,7 +126,7 @@ echo "<div class='row'>";
 		
 	
 		<div class="input-field col s12">
-		<select class="browser-default" name='company' required>
+		<select name='company' required>
 			<option value="" disabled selected>Chose a company</option>
 			<?php
 			
@@ -154,30 +154,32 @@ echo "<div class='row'>";
 			
 			?>			
 		</select>
-			
+		<br><br>	
 		</div>
 		<br>
-		<div class="input-field col s6">
-			<input class="validate" placeholder="Enter the number of shares" type="number" name="shares" required>
+        
+		<div class="input-field">
+            Number of shares:
+			<input class="validate" placeholder="Enter the number of shares" type="number" name="shares" min="1" required>
 		</div>
 		
 		<br>
-		
+		<br>
 		<div class="row">
 			
 			<input class="col s4" type="radio" onclick="deactivate()" name="type" id='type1' checked value="market">
 			<label for="type1">Market Price</label>
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			
+			<br><br>
 			<input class="col s4" type="radio" onclick="activate()" name="type" id="type2" value="limit">
-		
-			<label for="type2">Limit Price  <input class="col s4" type="number" id="limit_price" name="limit_price"></label>
+		  
+			<label for="type2">Limit Price  <input class="col s4" id="limit_price" name="limit_price"></label>
 
 			
 		</div>	
 		<br><br>
 		<input type="submit" class="btn" value="Place Order">
-		
+		<br><br>
 	</form>
 					
 					</div>
@@ -324,10 +326,19 @@ if(isset($_POST['name_reg']) && isset($_POST['email_reg']) && isset($_POST['pass
 
 	
 ?>
+            
 			</div>
+        
 		<script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
 		<script type="text/javascript" src="js/materialize.js"></script>
 
+        <script>
+            $(document).ready(function() 
+            {
+                $('select').material_select();
+            });
+            
+        </script>
 	</body>
 	
 </html>

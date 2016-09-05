@@ -33,7 +33,7 @@
 				<a href="index.php" id="logo" class="brand-logo">The Game Of Shares</a>
 			
 			<ul id="nav-mobile" class="right">
-				<li><a href='transactions.php'>Your Orders</a></li>
+				<li><a href='transactions.php'>My Orders</a></li>
 				<li><a href='logout.php'>Logout(<?php echo $user_name; ?>)</a></li>
 				
 			</ul>

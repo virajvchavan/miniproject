@@ -29,7 +29,7 @@
 				<a href="index.php" id="logo" class="brand-logo">The Game Of Shares</a>
 			
 			<ul id="nav-mobile" class="right">
-				<li><a href='transactions.php'>Your Orders</a></li>
+				<li><a href='transactions.php'>My Orders</a></li>
 				<li><a href='logout.php'>Logout(<?php echo $user_name; ?>)</a></li>
 				
 			</ul>
@@ -39,6 +39,8 @@
 			</div>
 
 			<div class="container">
+                <br><h4>Order Summary</h4>
+                <br><br>
 <?php
 
 
@@ -116,7 +118,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 					{
 						$sell_order_id = $array_sells['id'];
 						$seller_id = $array_sells['user_id'];
-						$seller_price = $limit_price;
+						$seller_price = $limit_price;         //imp
 						$seller_quantity = $array_sells['no_of_shares'];
 						
 						
@@ -132,7 +134,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								$query_delete_row = "DELETE FROM selling_orders WHERE id=$sell_order_id";
 								if(mysqli_query($conn, $query_delete_row))
 								{
-									echo "Deleted row<br>";
+									//echo "Deleted row<br>";
 								}
 								$completely_executed = true;	
                                 
@@ -141,7 +143,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 if(mysqli_query($conn, $query_transacation))
                                 {
                                     //success
-                                    echo "Added into transactions<br>";
+                                    echo "<div class='card'><div class='card-content'>$order_quantity_temp Shares baught for $seller_price Points.</div></div>";
                                 }
                                 
                                 //update shares_distribution table
@@ -149,7 +151,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
                                 if(mysqli_query($conn, $query_insert_shares_d))
                                 {
-                                    echo "Updated shares distibution table<br>";
+                                   // echo "Updated shares distibution table<br>";
                                 }
                                 else
                                     echo "Error inserting into shares_d table<br>";
@@ -167,7 +169,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								$query_delete_row = "DELETE FROM selling_orders WHERE id=$sell_order_id";
 								if(mysqli_query($conn, $query_delete_row))
 								{
-									echo "deleted a row<br>";
+									//echo "deleted a row<br>";
 								}
                                 
                                 //insert into transaction table
@@ -175,7 +177,8 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 if(mysqli_query($conn, $query_transacation))
                                 {
                                     //success
-                                    echo "Added into transactions<br>";
+                                    //echo "Added into transactions<br>";
+                                    echo "<div class='card'><div class='card'><div class='card-content'>$seller_quantity Shares bought for $seller_price Points.</div></div>";
                                 }
                                 
                                 //update shares_distribution table
@@ -183,7 +186,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
                                 if(mysqli_query($conn, $query_insert_shares_d))
                                 {
-                                    echo "Updated shares distibution table<br>";
+                                    //echo "Updated shares distibution table<br>";
                                 }
                                 else
                                     echo "Error inserting into shares_d table<br>";
@@ -199,7 +202,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								$query_update_row = "UPDATE `selling_orders` SET `no_of_shares`= '$seller_quantity' WHERE id = $sell_order_id";
 								if(mysqli_query($conn, $query_update_row))
 								{
-									echo "updated shares quantity for seller<br>";
+								    //echo "updated shares quantity for seller<br>";
 								}
 
 								$completely_executed = true;	
@@ -209,7 +212,8 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 if(mysqli_query($conn, $query_transacation))
                                 {
                                     //success
-                                    echo "Added into transactions<br>";
+                                    //echo "Added into transactions<br>";
+                                    echo "<div class='card'>$order_quantity_temp Shares baught for $seller_price.</div>";
                                 }
                                 
                                 //update shares_distribution table
@@ -217,7 +221,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
                                 if(mysqli_query($conn, $query_insert_shares_d))
                                 {
-                                    echo "Updated shares distibution table<br>";
+                                    //echo "Updated shares distibution table<br>";
                                 }
                                 else
                                     echo "Error inserting into shares_d table<br>";
@@ -237,7 +241,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
 							if(mysqli_query($conn, $query_update_balance1))
 							{
-								echo "Updated balance for buyer<br>";
+								//echo "Updated balance for buyer<br>";
 							}
 							else
 								echo "Error updating buyer balance in users table";
@@ -251,7 +255,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
 								if(mysqli_query($conn, $query_update_balance2))
 								{
-									echo "updaed balance for seller<br>";
+									//echo "updaed balance for seller<br>";
 								}
 								else
 									echo "Error updating seller balance in users table<br>";
@@ -281,7 +285,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 							//add entries in balances_of_users table for changes in user balances
 							if(mysqli_query($conn, $query_update_balances_both))
 							{
-								echo "Updated balances of both<br>";
+								//echo "Updated balances of both<br>";
 							}
 							else
 							{
@@ -290,16 +294,14 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
 
 
-							
-
 							//set the market price of the share to the price the transaction occurred
-							$market_price = $seller_price;
+							$market_price = $limit_price;
 
 
 							
 							if($completely_executed)
 							{
-								echo "Completely executed.<br>";
+								echo "<div class='card'><div class='card-content'>Your order is completely executed.<br>See the <a href='transactions.php'>Trade Book</a></div></div>";
 								exit();
 							}
 
@@ -314,7 +316,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 						$query_insert_in_buy = "INSERT INTO buying_orders(company_id, user_id, no_of_shares, price, type) VALUES($company_id, $user_id, $order_quantity_temp, $limit_price, 'limit')";
 						if(mysqli_query($conn, $query_insert_in_buy))
 						{
-							echo "Partial execution. Added entry into buying_orders<br>";
+							echo "<div class='card'><div class='card-content'>Order partially executed.<br>Order will execute when a seller is available.<br>Keep checking <a href='transactions.php'>My Orders</a> Page to check the order status.</div></div>";
 						}
 					}
             }
@@ -352,7 +354,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								$query_delete_row = "DELETE FROM selling_orders WHERE id=$sell_order_id";
 								if(mysqli_query($conn, $query_delete_row))
 								{
-									echo "Deleted row<br>";
+									//echo "Deleted row<br>";
 								}
 								$completely_executed = true;	
                                 
@@ -361,7 +363,8 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 if(mysqli_query($conn, $query_transacation))
                                 {
                                     //success
-                                    echo "Added into transactions<br>";
+                                    //echo "Added into transactions<br>";
+                                    echo "<div class='card'><div class='card-content'>$order_quantity_temp Shares baught for $seller_price Points.</div></div>";
                                 }
                                 
                                 //update shares_distribution table
@@ -369,7 +372,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
                                 if(mysqli_query($conn, $query_insert_shares_d))
                                 {
-                                    echo "Updated shares distibu table<br>";
+                                    //echo "Updated shares distibu table<br>";
                                 }
                                 else
                                     echo "Error inserting into shares_d table<br>";
@@ -385,7 +388,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								$query_delete_row = "DELETE FROM selling_orders WHERE id=$sell_order_id";
 								if(mysqli_query($conn, $query_delete_row))
 								{
-									echo "deleted a row<br>";
+									//echo "deleted a row<br>";
 								}
                                 
                                 //insert into transaction table
@@ -393,7 +396,8 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 if(mysqli_query($conn, $query_transacation))
                                 {
                                     //success
-                                    echo "Added into transactions<br>";
+                                    //echo "Added into transactions<br>";
+                                    echo "<div class='card'><div class='card-content'>$seller_quantity Shares baught for $seller_price Points.</div></div>";
                                 }
 
                                 //update shares_distribution table
@@ -401,7 +405,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
                                 if(mysqli_query($conn, $query_insert_shares_d))
                                 {
-                                    echo "Updated shares distibu table<br>";
+                                    //echo "Updated shares distibu table<br>";
                                 }
                                 else
                                     echo "Error inserting into shares_d table<br>";
@@ -417,7 +421,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								$query_update_row = "UPDATE `selling_orders` SET `no_of_shares`= '$seller_quantity' WHERE id = $sell_order_id";
 								if(mysqli_query($conn, $query_update_row))
 								{
-									echo "updated shares quantity for seller<br>";
+									//echo "updated shares quantity for seller<br>";
 								}
 
 								$completely_executed = true;	
@@ -427,7 +431,8 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 if(mysqli_query($conn, $query_transacation))
                                 {
                                     //success
-                                    echo "Added into transactions<br>";
+                                    //echo "Added into transactions<br>";
+                                    echo "<div class='card'><div class='card-content'>$order_quantity_temp Shares baught for $seller_price Points.</div></div>";
                                 }
 
                                 //update shares_distribution table
@@ -435,7 +440,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
                                 if(mysqli_query($conn, $query_insert_shares_d))
                                 {
-                                    echo "Updated shares distibu table<br>";
+                                    //echo "Updated shares distibu table<br>";
                                 }
                                 else
                                     echo "Error inserting into shares_d table<br>";
@@ -451,7 +456,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
 							if(mysqli_query($conn, $query_update_balance1))
 							{
-								echo "Updated balance for buyer<br>";
+								//echo "Updated balance for buyer<br>";
 							}
 							else
 								echo "Error updating buyer balance in users table";
@@ -465,7 +470,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
 								if(mysqli_query($conn, $query_update_balance2))
 								{
-									echo "updaed balance for seller<br>";
+									//echo "updaed balance for seller<br>";
 								}
 								else
 									echo "Error updating seller balance in users table<br>";
@@ -495,7 +500,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 							//add entries in balances_of_users table for changes in user balances
 							if(mysqli_query($conn, $query_update_balances_both))
 							{
-								echo "Updated balances of both<br>";
+								//echo "Updated balances of both<br>";
 							}
 							else
 							{
@@ -512,7 +517,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 							
 							if($completely_executed)
 							{
-								echo "Completely executed.<br>";
+								echo "<div class='card'><div class='card-content'>Your order is completely executed.<br><br>See <a href='transactions.php'>Trade Book</a></div></div>";
 								exit();
 							}
 
@@ -535,7 +540,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 					$query_insert_in_buy = "INSERT INTO buying_orders(company_id, user_id, no_of_shares, price, type) VALUES($company_id, $user_id, $order_quantity_temp, $market_price, 'market')";
 					if(mysqli_query($conn, $query_insert_in_buy))
 					{
-						echo "Inerted into buying_orders<br>";
+						echo "<div class='card'><div class='card-content'>There's no seller available right now. Check order status on <a href='transactions.php'>My Orders</a></div></div>";
 					}
 				}
 				else
@@ -560,7 +565,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								$query_delete_row = "DELETE FROM selling_orders WHERE id=$sell_order_id";
 								if(mysqli_query($conn, $query_delete_row))
 								{
-									echo "Deleted row<br>";
+									//echo "Deleted row<br>";
 								}
 								$completely_executed = true;	
                                 
@@ -570,7 +575,9 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 if(mysqli_query($conn, $query_transacation))
                                 {
                                     //success
-                                    echo "Added into transactions<br>";
+                                    //echo "Added into transactions<br>";
+                                    
+                                    echo "<div class='card'><div class='card-content'>$order_quantity_temp shares bought at $seller_price Points.</div></div>";
                                 }
                                 
                                 //update shares_distribution table
@@ -578,7 +585,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
                                 if(mysqli_query($conn, $query_insert_shares_d))
                                 {
-                                    echo "Updated shares distibu table<br>";
+                                    //echo "Updated shares distibu table<br>";
                                 }
                                 else
                                     echo "Error inserting into shares_d table<br>";
@@ -595,7 +602,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								$query_delete_row = "DELETE FROM selling_orders WHERE id=$sell_order_id";
 								if(mysqli_query($conn, $query_delete_row))
 								{
-									echo "deleted a row<br>";
+									//echo "deleted a row<br>";
 								}
                                 
                                 //insert into transaction table
@@ -603,7 +610,9 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 if(mysqli_query($conn, $query_transacation))
                                 {
                                     //success
-                                    echo "Added into transactions<br>";
+                                    //echo "Added into transactions<br>";
+                                    
+                                     echo "<div class='card'><div class='card-content'>$seller_quantity shares bought at $seller_price Points.</div></div>";
                                 }
                                 
                                 //update shares_distribution table
@@ -611,7 +620,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
                                 if(mysqli_query($conn, $query_insert_shares_d))
                                 {
-                                    echo "Updated shares distibu table<br>";
+                                    //echo "Updated shares distibu table<br>";
                                 }
                                 else
                                     echo "Error inserting into shares_d table<br>";
@@ -626,7 +635,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								$query_update_row = "UPDATE `selling_orders` SET `no_of_shares`= '$seller_quantity' WHERE id = $sell_order_id";
 								if(mysqli_query($conn, $query_update_row))
 								{
-									echo "updated shares quantity for seller<br>";
+									//echo "updated shares quantity for seller<br>";
 								}
 
 								$completely_executed = true;	
@@ -636,7 +645,8 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 if(mysqli_query($conn, $query_transacation))
                                 {
                                     //success
-                                    echo "Added into transactions<br>";
+                                    //echo "Added into transactions<br>";
+                                     echo "<div class='card'><div class='card-content'>$order_quantity_temp shares bought at $seller_price Points.</div></div>";
                                 }
                                 
                                 //update shares_distribution table
@@ -644,7 +654,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
                                 if(mysqli_query($conn, $query_insert_shares_d))
                                 {
-                                    echo "Updated shares distibu table<br>";
+                                    //echo "Updated shares distibu table<br>";
                                 }
                                 else
                                     echo "Error inserting into shares_d table<br>";
@@ -663,7 +673,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
 							if(mysqli_query($conn, $query_update_balance1))
 							{
-								echo "Updated balance for buyer<br>";
+								//echo "Updated balance for buyer<br>";
 							}
 							else
 								echo "Error updating buyer balance in users table";
@@ -677,7 +687,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
 								if(mysqli_query($conn, $query_update_balance2))
 								{
-									echo "updaed balance for seller<br>";
+									//echo "updaed balance for seller<br>";
 								}
 								else
 									echo "Error updating seller balance in users table<br>";
@@ -707,7 +717,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 							//add entries in balances_of_users table for changes in user balances
 							if(mysqli_query($conn, $query_update_balances_both))
 							{
-								echo "Updated balances of both<br>";
+								//echo "Updated balances of both<br>";
 							}
 							else
 							{
@@ -724,7 +734,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 							
 							if($completely_executed)
 							{
-								echo "Completely executed.<br>";
+								 echo "<div class='card'><div class='card-content'>Order completely executed.<br>See the <a href='transactions.php'>Trade Book</a></div></div>";
 								exit();
 							}
 
@@ -739,7 +749,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 						$query_insert_in_buy = "INSERT INTO buying_orders(company_id, user_id, no_of_shares, price, type) VALUES($company_id, $user_id, $order_quantity_temp, $market_price, 'market')";
 						if(mysqli_query($conn, $query_insert_in_buy))
 						{
-							echo "Partial execution. Added entry into buying_orders<br>";
+							echo "<div class='card'><div class='card-content'>Partial execution. Order will completely execute when a buyer will be available.<br>Keep checking <a href='transcations.php'>My Orders</a> Page to see the order status.</div></div>";
 						}
 					}
 				}
@@ -781,16 +791,6 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 				exit();
 			}
 			
-			//add an entry in selling_orders
-
-			/*$query_insert_in_sell = "INSERT INTO selling_orders(company_id, user_id, no_of_shares, price, type) VALUES($company_id, $user_id, $order_quantity_temp, $limit_price, 'limit')";
-			if(mysqli_query($conn, $query_insert_in_sell))
-			{
-				echo "Limit order added in selling_orders table<br>";
-			}
-			else
-				echo "Failed adding in selling_orders for limit<br>";*/
-            
             
             //first check for any market orders in buying_orders table, if found, directly execute at the limit price
             $query_cmp_buying_table = "SELECT * FROM `buying_orders` WHERE company_id = $company_id AND type='market'";
@@ -817,7 +817,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								$query_delete_row = "DELETE FROM buying_orders WHERE id=$buy_order_id";
 								if(mysqli_query($conn, $query_delete_row))
 								{
-									echo "Deleted row from buying_orders<br>";
+//									echo "Deleted row from buying_orders<br>";
 								}
 								else
 									echo "Failed nb<br>";
@@ -828,7 +828,8 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 if(mysqli_query($conn, $query_transacation))
                                 {
                                     //success
-                                    echo "Inerted into transactions<br>";
+  //                                  echo "Inerted into transactions<br>";
+                                      echo "<div class='card'><div class='card-content'>$order_quantity_temp shares sold at $buyer_price.</div></div>";
 
                                 }
                                 else
@@ -840,7 +841,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
                                 if(mysqli_query($conn, $query_insert_shares_d))
                                 {
-                                    echo "Shares distribution table updated<br>";
+    //                                echo "Shares distribution table updated<br>";
                                 }
                                 else
                                     echo "Error inserting into shares_d table<br>";
@@ -855,7 +856,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								$query_delete_row = "DELETE FROM buying_orders WHERE id=$buy_order_id";
 								if(mysqli_query($conn, $query_delete_row))
 								{
-									echo "Deleted row from buying_orders.<br>";
+                                    //echo "Deleted row from buying_orders.<br>";
 								}
                                 
                                 
@@ -864,7 +865,9 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 if(mysqli_query($conn, $query_transacation))
                                 {
                                     //success
-                                    echo "Inerted into transactions<br>";
+                                   // echo "Inerted into transactions<br>";
+                                    
+                                    echo "<div class='card'><div class='card-content'>$buyer_quantity shares sold at $buyer_price Points.</div></div>";
 
                                 }
                                 else
@@ -875,7 +878,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
                                 if(mysqli_query($conn, $query_insert_shares_d))
                                 {
-                                    echo "Shares distribution table updated<br>";
+//                                    echo "Shares distribution table updated<br>";
                                 }
                                 else
                                     echo "Error inserting into shares_d table<br>";
@@ -890,7 +893,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								$query_update_row = "UPDATE `buying_orders` SET `no_of_shares`= '$buyer_quantity' WHERE id = $buy_order_id";
 								if(mysqli_query($conn, $query_update_row))
 								{
-									echo "Updated shares quantity for a row<br>";
+									//echo "Updated shares quantity for a row<br>";
 								}	
 								else
 									echo "Failes a";
@@ -903,7 +906,9 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 if(mysqli_query($conn, $query_transacation))
                                 {
                                     //success
-                                    echo "Inerted into transactions<br>";
+                                    //echo "Inerted into transactions<br>";
+                                    
+                                    echo "<div class='card'><div class='card-content'>$order_quantity_temp shares sold at $buyer_price Points.</div></div>";
 
                                 }
                                 else
@@ -914,7 +919,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
                                 if(mysqli_query($conn, $query_insert_shares_d))
                                 {
-                                    echo "Shares distribution table updated<br>";
+                                   // echo "Shares distribution table updated<br>";
                                 }
                                 else
                                     echo "Error inserting into shares_d table<br>";
@@ -930,7 +935,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
 							if(mysqli_query($conn, $query_update_balance1))
 							{
-								echo "Balance updated for seller<br>";
+								//echo "Balance updated for seller<br>";
 							}
 							else
 								echo "Error updating seller balance in users table<br>";
@@ -943,7 +948,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
 								if(mysqli_query($conn, $query_update_balance2))
 								{
-									echo "Balancec updated for buyer<br>";
+									//echo "Balancec updated for buyer<br>";
 								}
 								else
 									echo "Error updating buyer balance in users table<br>";
@@ -969,7 +974,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 							//add entries in balances_of_users table for changes in user balances
 							if(mysqli_query($conn, $query_update_balances_both))
 							{
-								echo "Balance updated for both<br>";
+								//echo "Balance updated for both<br>";
 							}
 							else
 							{
@@ -985,7 +990,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 							
 							if($completely_executed)
 							{
-								echo "Completely executed.<br>";
+								echo "<div class='card'><div class='card-content'>Your order is completely executed. <br>See the <a href='transactions.php'>Trade Book</a>.</div></div>";
 								exit;
 							}
 
@@ -1000,10 +1005,14 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 						$query_insert_in_sell = "INSERT INTO selling_orders(company_id, user_id, no_of_shares, price, type) VALUES($company_id, $user_id, $order_quantity_temp, $limit_price, 'limit')";
 						if(mysqli_query($conn, $query_insert_in_sell))
 						{
-							echo "Added partial entry in selling_orders<br>";
+							//echo "Added partial entry in selling_orders<br>";
+                            
+                            echo "<div class='card'>Order partially executed. <br>It will completely execute when a seller is available.<br>Check order status on <a href='transactions.php'>My Orders</a></div>";
 						}
 						else
 							echo "Error insert in sell for market<br>";
+                        
+                        
 					}
                 
             }
@@ -1040,7 +1049,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								$query_delete_row = "DELETE FROM buying_orders WHERE id=$buy_order_id";
 								if(mysqli_query($conn, $query_delete_row))
 								{
-									echo "Deleted row from buying_orders<br>";
+		//							echo "Deleted row from buying_orders<br>";
 								}
 								else
 									echo "Failed nb<br>";
@@ -1051,7 +1060,8 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 if(mysqli_query($conn, $query_transacation))
                                 {
                                     //success
-                                    echo "Inerted into transactions<br>";
+          //                          echo "Inerted into transactions<br>";
+                                    echo "<div class='card'><div class='card-panel'>$order_quantity_temp shares sold at $buyer_price.</div></div>";
 
                                 }
                                 else
@@ -1062,7 +1072,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
                                 if(mysqli_query($conn, $query_insert_shares_d))
                                 {
-                                    echo "Shares distribution table updated<br>";
+                                    //echo "Shares distribution table updated<br>";
                                 }
                                 else
                                     echo "Error inserting into shares_d table<br>";
@@ -1077,7 +1087,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								$query_delete_row = "DELETE FROM buying_orders WHERE id=$buy_order_id";
 								if(mysqli_query($conn, $query_delete_row))
 								{
-									echo "Deleted row from buying_orders.<br>";
+									//echo "Deleted row from buying_orders.<br>";
 								}
                                 
                                 
@@ -1086,7 +1096,8 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 if(mysqli_query($conn, $query_transacation))
                                 {
                                     //success
-                                    echo "Inerted into transactions<br>";
+                                    //echo "Inerted into transactions<br>";
+                                    echo "<div class='card'><div class='card-content'>$buyer_quantity shares sold at $buyer_price Points.</div></div>";
 
                                 }
                                 else
@@ -1097,7 +1108,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
                                 if(mysqli_query($conn, $query_insert_shares_d))
                                 {
-                                    echo "Shares distribution table updated<br>";
+                                    //echo "Shares distribution table updated<br>";
                                 }
                                 else
                                     echo "Error inserting into shares_d table<br>";
@@ -1112,7 +1123,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								$query_update_row = "UPDATE `buying_orders` SET `no_of_shares`= '$buyer_quantity' WHERE id = $buy_order_id";
 								if(mysqli_query($conn, $query_update_row))
 								{
-									echo "Updated shares quantity for a row<br>";
+									//echo "Updated shares quantity for a row<br>";
 								}	
 								else
 									echo "Failes a";
@@ -1125,7 +1136,8 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 if(mysqli_query($conn, $query_transacation))
                                 {
                                     //success
-                                    echo "Inerted into transactions<br>";
+                                    //echo "Inerted into transactions<br>";
+                                    echo "<div class='card'><div class='card-content'>$order_quantity_temp shares sold at $buyer_price Points.</div></div>";
 
                                 }
                                 else
@@ -1136,7 +1148,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
                                 if(mysqli_query($conn, $query_insert_shares_d))
                                 {
-                                    echo "Shares distribution table updated<br>";
+                                   // echo "Shares distribution table updated<br>";
                                 }
                                 else
                                     echo "Error inserting into shares_d table<br>";
@@ -1153,7 +1165,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
 							if(mysqli_query($conn, $query_update_balance1))
 							{
-								echo "Balance updated for seller<br>";
+								//echo "Balance updated for seller<br>";
 							}
 							else
 								echo "Error updating seller balance in users table<br>";
@@ -1166,7 +1178,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
 								if(mysqli_query($conn, $query_update_balance2))
 								{
-									echo "Balancec updated for buyer<br>";
+									//echo "Balancec updated for buyer<br>";
 								}
 								else
 									echo "Error updating buyer balance in users table<br>";
@@ -1192,7 +1204,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 							//add entries in balances_of_users table for changes in user balances
 							if(mysqli_query($conn, $query_update_balances_both))
 							{
-								echo "Balance updated for both<br>";
+								//echo "Balance updated for both<br>";
 							}
 							else
 							{
@@ -1208,7 +1220,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 							
 							if($completely_executed)
 							{
-								echo "Completely executed.<br>";
+								echo "<div class='card'><div class='card-content'>Your Order is completely executed.<br>See the <a href='transactions.php'>Trade Book</a></div></div>";
 								exit;
 							}
 
@@ -1231,7 +1243,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 					$query_insert_in_sell = "INSERT INTO selling_orders(company_id, user_id, no_of_shares, price, type) VALUES($company_id, $user_id, $order_quantity_temp, $market_price, 'market')";
 					if(mysqli_query($conn, $query_insert_in_sell))
 					{
-						echo "Market order added in selling_orders table<br>";
+						echo "<div class='card'><div class='card-content'>No buyer available right now.<br>Keep checking <a href='transactions.php'>My Orders</a> Page to know the Order Status.</div></div>";
 					}
 					else
 						echo "Failed adding in selling_orders for market<br>";
@@ -1261,7 +1273,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 									echo "Deleted row from buying_orders<br>";
 								}
 								else
-									echo "Failed nb<br>";
+								    //echo "Failed nb<br>";
 								$completely_executed = true;	
                                 
                                 //insert into transaction table
@@ -1269,7 +1281,8 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 if(mysqli_query($conn, $query_transacation))
                                 {
                                     //success
-                                    echo "Inerted into transactions<br>";
+                                    //echo "Inerted into transactions<br>";
+                                    echo "<div class='card'><div class='card-content'>$order_quantity_temp shares sold at $buyer_price Points.</div></div>";
 
                                 }
                                 else
@@ -1280,7 +1293,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
                                 if(mysqli_query($conn, $query_insert_shares_d))
                                 {
-                                    echo "Shares distribution table updated<br>";
+                                    //echo "Shares distribution table updated<br>";
                                 }
                                 else
                                     echo "Error inserting into shares_d table<br>";
@@ -1296,7 +1309,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								$query_delete_row = "DELETE FROM buying_orders WHERE id=$buy_order_id";
 								if(mysqli_query($conn, $query_delete_row))
 								{
-									echo "Deleted row from buying_orders.<br>";
+								//	echo "Deleted row from buying_orders.<br>";
 								}
                                 
                                 
@@ -1305,7 +1318,8 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 if(mysqli_query($conn, $query_transacation))
                                 {
                                     //success
-                                    echo "Inerted into transactions<br>";
+                                  //  echo "Inerted into transactions<br>";
+                                    echo "<div class='card'><div class='card-content'>$seller_quantity shares sold at $buyer_price Points.</div></div>";
 
                                 }
                                 else
@@ -1316,7 +1330,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
                                 if(mysqli_query($conn, $query_insert_shares_d))
                                 {
-                                    echo "Shares distribution table updated<br>";
+                                    //echo "Shares distribution table updated<br>";
                                 }
                                 else
                                     echo "Error inserting into shares_d table<br>";
@@ -1332,7 +1346,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								$query_update_row = "UPDATE `buying_orders` SET `no_of_shares`= '$buyer_quantity' WHERE id = $buy_order_id";
 								if(mysqli_query($conn, $query_update_row))
 								{
-									echo "Updated shares quantity for a row<br>";
+									//echo "Updated shares quantity for a row<br>";
 								}	
 								else
 									echo "Failes a";
@@ -1345,7 +1359,8 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 if(mysqli_query($conn, $query_transacation))
                                 {
                                     //success
-                                    echo "Inerted into transactions<br>";
+                                    //echo "Inerted into transactions<br>";
+                                    echo "<div class='card'><div class='card-content'>$order_quantity_temp shares sold at $buyer_price Points.</div></div>";
 
                                 }
                                 else
@@ -1356,7 +1371,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
                                 if(mysqli_query($conn, $query_insert_shares_d))
                                 {
-                                    echo "Shares distribution table updated<br>";
+                                    //echo "Shares distribution table updated<br>";
                                 }
                                 else
                                     echo "Error inserting into shares_d table<br>";
@@ -1376,7 +1391,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
 							if(mysqli_query($conn, $query_update_balance1))
 							{
-								echo "Balance updated for seller<br>";
+								//echo "Balance updated for seller<br>";
 							}
 							else
 								echo "Error updating seller balance in users table<br>";
@@ -1389,7 +1404,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
 								if(mysqli_query($conn, $query_update_balance2))
 								{
-									echo "Balancec updated for buyer<br>";
+									//echo "Balancec updated for buyer<br>";
 								}
 								else
 									echo "Error updating buyer balance in users table<br>";
@@ -1415,7 +1430,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 							//add entries in balances_of_users table for changes in user balances
 							if(mysqli_query($conn, $query_update_balances_both))
 							{
-								echo "Balance updated for both<br>";
+								//echo "Balance updated for both<br>";
 							}
 							else
 							{
@@ -1431,7 +1446,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 							
 							if($completely_executed)
 							{
-								echo "Completely executed.<br>";
+								echo "<div class='card'><div class='card-content'>Your order is completely executed.<br>See the <a href='transactions.php'>Trade Book</a></div></div>";
 								exit;
 							}
 
@@ -1446,7 +1461,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 						$query_insert_in_sell = "INSERT INTO selling_orders(company_id, user_id, no_of_shares, price, type) VALUES($company_id, $user_id, $order_quantity_temp, $market_price, 'market')";
 						if(mysqli_query($conn, $query_insert_in_sell))
 						{
-							echo "Added partial entry in selling_orders<br>";
+							echo "<div class='card'><div class='card-content'>Order is partially executed. Check Order Status on <a href='transactions.php'>My Orders</a> Page.</div></div>";
 						}
 						else
 							echo "Error insert in sell for market<br>";
@@ -1469,14 +1484,14 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 	
 	if(mysqli_query($conn, $query_update_price)) 
 	{
-		echo "Changed the price of share 1<br>";
+		//echo "Changed the price of share 1<br>";
 	}
 	else
 		echo "Failed to change the price of share 1<br>";
 	
     if(mysqli_query($conn, $query_insert_price))
     {
-         echo "Changed the price of share 2<br>";
+         //echo "Changed the price of share 2<br>";
     }
     else
         echo "Failed to change the price of share 2<br>";

@@ -26,7 +26,7 @@
 				else if(isLoggedIn())
 				{
 					
-					echo "<li><a href='transactions.php'>Your Orders</a></li>";
+					echo "<li><a href='transactions.php'>My Orders</a></li>";
 					echo "<li><a href='logout.php'>Logout($user_name)</a></li>";
 				}
 				else

@@ -45,7 +45,7 @@
 				<a href="index.php" id="logo" class="brand-logo">The Game Of Shares</a>
 			
 			<ul id="nav-mobile" class="right ">
-				<li class="active"><a href='transactions.php'>Your Orders</a></li>
+				<li class="active"><a href='transactions.php'>My Orders</a></li>
 				<li><a href='logout.php'>Logout(<?php echo $user_name; ?>)</a></li>
 				
 			</ul>
@@ -73,8 +73,11 @@
 				<tbody>	
 					
 					<?php
-					
-					$query_order_book_sell = "SELECT selling_orders.id, selling_orders.price, selling_orders.no_of_shares, selling_orders.time, companies.abbrivation FROM  selling_orders, companies WHERE selling_orders.company_id = companies.id AND selling_orders.user_id = $user_id ORDER BY selling_orders.id DESC";
+                    
+                    
+                    
+					//order book
+					$query_order_book_sell = "SELECT selling_orders.id, selling_orders.price, selling_orders.no_of_shares, selling_orders.time, selling_orders.type, companies.abbrivation FROM  selling_orders, companies WHERE selling_orders.company_id = companies.id AND selling_orders.user_id = $user_id ORDER BY selling_orders.id DESC";
 					
 					if($run_sells = mysqli_query($conn, $query_order_book_sell))
 					{
@@ -87,14 +90,19 @@
 								$quantity = $array_sells['no_of_shares'];
 								$abbr = $array_sells['abbrivation'];
                                 $order_id = $array_sells['id'];
+                                $type = $array_sells['type'];
 								
 								echo "<tr>
 										<td>$time</td>
 										<td>Sell</td>
 										<td>$abbr</td>
-										<td>$quantity</td>
-										<td>$price</td>
-										<td><span id='yellow'>Pending</span></td>
+										<td>$quantity</td>";
+                                if($type == "market")
+                                    echo "<td>Market</td>";
+                                else
+                                    echo "<td>Limit ($price)</td>";
+										
+									echo "<td><span id='yellow'>Pending</span></td>
                                         <td>
                                         <form action='delete.php?sid=$order_id' onsubmit='return deleteOrder()' method='post'>
 							             <input type='submit' value='Cancel' id='red'>
@@ -106,7 +114,7 @@
 					}
 					
 					
-					$query_order_book_buy = "SELECT buying_orders.id, buying_orders.price, buying_orders.no_of_shares, buying_orders.time, companies.abbrivation FROM  buying_orders, companies WHERE buying_orders.company_id = companies.id AND buying_orders.user_id = $user_id ORDER BY buying_orders.id DESC";
+					$query_order_book_buy = "SELECT buying_orders.id, buying_orders.price, buying_orders.no_of_shares, buying_orders.time, buying_orders.type, companies.abbrivation FROM  buying_orders, companies WHERE buying_orders.company_id = companies.id AND buying_orders.user_id = $user_id ORDER BY buying_orders.id DESC";
 					
 					if($run_buys = mysqli_query($conn, $query_order_book_buy))
 					{
@@ -119,14 +127,20 @@
 								$quantity = $array_sells['no_of_shares'];
 								$abbr = $array_sells['abbrivation'];
                                 $order_id = $array_sells['id'];
+                                $type = $array_sells['type'];
 								
 								echo "<tr>
 										<td>$time</td>
 										<td>Buy</td>
 										<td>$abbr</td>
-										<td>$quantity</td>
-										<td>$price</td>
-										<td><span id='yellow'>Pending</span></td>
+										<td>$quantity</td>";
+                                
+								if($type == "market")
+                                    echo "<td>Market</td>";
+                                else
+                                    echo "<td>1 (Limit)</td>";
+                                
+									echo "<td><span id='yellow'>Pending</span></td>
                                         <td>
                                         <form action='delete.php?bid=$order_id' onsubmit='return deleteOrder()' method='post'>
 							             <input type='submit' value='Cancel' id='red'>

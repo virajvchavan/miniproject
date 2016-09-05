@@ -143,6 +143,18 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                     //success
                                     echo "Added into transactions<br>";
                                 }
+                                
+                                //update shares_distribution table
+                                $query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, $order_quantity_temp), ($seller_id, $company_id, -$order_quantity_temp)";
+
+                                if(mysqli_query($conn, $query_insert_shares_d))
+                                {
+                                    echo "Updated shares distibution table<br>";
+                                }
+                                else
+                                    echo "Error inserting into shares_d table<br>";
+
+
 
 							}
                         
@@ -165,6 +177,16 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                     //success
                                     echo "Added into transactions<br>";
                                 }
+                                
+                                //update shares_distribution table
+                                $query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, $seller_quantity), ($seller_id, $company_id, -$seller_quantity)";
+
+                                if(mysqli_query($conn, $query_insert_shares_d))
+                                {
+                                    echo "Updated shares distibution table<br>";
+                                }
+                                else
+                                    echo "Error inserting into shares_d table<br>";
 
 
 							}
@@ -189,10 +211,21 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                     //success
                                     echo "Added into transactions<br>";
                                 }
+                                
+                                //update shares_distribution table
+                                $query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, $order_quantity_temp), ($seller_id, $company_id, -$order_quantity_temp)";
+
+                                if(mysqli_query($conn, $query_insert_shares_d))
+                                {
+                                    echo "Updated shares distibution table<br>";
+                                }
+                                else
+                                    echo "Error inserting into shares_d table<br>";
+
+
+                                
 
 							}
-							
-
 							
 
 
@@ -257,17 +290,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
 
 
-							//update shares_distribution table
-							$query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, $order_quantity_temp), ($seller_id, $company_id, -$order_quantity_temp)";
-
-							if(mysqli_query($conn, $query_insert_shares_d))
-							{
-								echo "Updated shares distibution table<br>";
-							}
-							else
-								echo "Error inserting into shares_d table<br>";
-
-
+							
 
 							//set the market price of the share to the price the transaction occurred
 							$market_price = $seller_price;
@@ -340,6 +363,16 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                     //success
                                     echo "Added into transactions<br>";
                                 }
+                                
+                                //update shares_distribution table
+                                $query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, $order_quantity_temp), ($seller_id, $company_id, -$order_quantity_temp)";
+
+                                if(mysqli_query($conn, $query_insert_shares_d))
+                                {
+                                    echo "Updated shares distibu table<br>";
+                                }
+                                else
+                                    echo "Error inserting into shares_d table<br>";
 
 							}
                         
@@ -362,6 +395,16 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                     //success
                                     echo "Added into transactions<br>";
                                 }
+
+                                //update shares_distribution table
+                                $query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, $seller_quantity), ($seller_id, $company_id, -$seller_quantity)";
+
+                                if(mysqli_query($conn, $query_insert_shares_d))
+                                {
+                                    echo "Updated shares distibu table<br>";
+                                }
+                                else
+                                    echo "Error inserting into shares_d table<br>";
 
 
 							}
@@ -386,6 +429,16 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                     //success
                                     echo "Added into transactions<br>";
                                 }
+
+                                //update shares_distribution table
+                                $query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, $order_quantity_temp), ($seller_id, $company_id, -$order_quantity_temp)";
+
+                                if(mysqli_query($conn, $query_insert_shares_d))
+                                {
+                                    echo "Updated shares distibu table<br>";
+                                }
+                                else
+                                    echo "Error inserting into shares_d table<br>";
 
 							}
 							
@@ -449,17 +502,6 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								echo "Failed adding entries in balances_of_users table<br>";
 							}
 
-
-
-							//update shares_distribution table
-							$query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, $order_quantity_temp), ($seller_id, $company_id, -$order_quantity_temp)";
-
-							if(mysqli_query($conn, $query_insert_shares_d))
-							{
-								echo "Updated shares distibu table<br>";
-							}
-							else
-								echo "Error inserting into shares_d table<br>";
 
 
 
@@ -530,6 +572,18 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                     //success
                                     echo "Added into transactions<br>";
                                 }
+                                
+                                //update shares_distribution table
+                                $query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, $order_quantity_temp), ($seller_id, $company_id, -$order_quantity_temp)";
+
+                                if(mysqli_query($conn, $query_insert_shares_d))
+                                {
+                                    echo "Updated shares distibu table<br>";
+                                }
+                                else
+                                    echo "Error inserting into shares_d table<br>";
+
+
 							}
                         
 							if($order_quantity_temp > $seller_quantity)
@@ -551,6 +605,16 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                     //success
                                     echo "Added into transactions<br>";
                                 }
+                                
+                                //update shares_distribution table
+                                $query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, $seller_quantity), ($seller_id, $company_id, -$seller_quantity)";
+
+                                if(mysqli_query($conn, $query_insert_shares_d))
+                                {
+                                    echo "Updated shares distibu table<br>";
+                                }
+                                else
+                                    echo "Error inserting into shares_d table<br>";
 
 							}
 							elseif($order_quantity_temp < $seller_quantity)
@@ -574,6 +638,16 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                     //success
                                     echo "Added into transactions<br>";
                                 }
+                                
+                                //update shares_distribution table
+                                $query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, $order_quantity_temp), ($seller_id, $company_id, -$order_quantity_temp)";
+
+                                if(mysqli_query($conn, $query_insert_shares_d))
+                                {
+                                    echo "Updated shares distibu table<br>";
+                                }
+                                else
+                                    echo "Error inserting into shares_d table<br>";
 
 
 							}
@@ -641,18 +715,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 							}
 
 
-
-							//update shares_distribution table
-							$query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, $order_quantity_temp), ($seller_id, $company_id, -$order_quantity_temp)";
-
-							if(mysqli_query($conn, $query_insert_shares_d))
-							{
-								echo "Updated shares distibu table<br>";
-							}
-							else
-								echo "Error inserting into shares_d table<br>";
-
-
+							
 
 							//set the market price of the share to the price the transaction occurred
 							$market_price = $seller_price;
@@ -770,7 +833,18 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 }
                                 else
                                     echo "Failed inserting transaction<br>";
-							}
+                                
+                                
+                                //update shares_distribution table
+                                $query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, -$order_quantity_temp), ($buyer_id, $company_id, $order_quantity_temp)";
+
+                                if(mysqli_query($conn, $query_insert_shares_d))
+                                {
+                                    echo "Shares distribution table updated<br>";
+                                }
+                                else
+                                    echo "Error inserting into shares_d table<br>";
+                            }
 
 							if($order_quantity_temp > $buyer_quantity)
 							{
@@ -795,6 +869,16 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 }
                                 else
                                     echo "Failed inserting transaction<br>";
+                                
+                                //update shares_distribution table
+                                $query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, -$buyer_quantity), ($buyer_id, $company_id, $buyer_quantity)";
+
+                                if(mysqli_query($conn, $query_insert_shares_d))
+                                {
+                                    echo "Shares distribution table updated<br>";
+                                }
+                                else
+                                    echo "Error inserting into shares_d table<br>";
 
 							}
 							elseif($order_quantity_temp < $buyer_quantity)
@@ -824,12 +908,19 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 }
                                 else
                                     echo "Failed inserting transaction<br>";
+                                
+                                //update shares_distribution table
+                                $query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, -$order_quantity_temp), ($buyer_id, $company_id, $order_quantity_temp)";
+
+                                if(mysqli_query($conn, $query_insert_shares_d))
+                                {
+                                    echo "Shares distribution table updated<br>";
+                                }
+                                else
+                                    echo "Error inserting into shares_d table<br>";
 
 							}
 						
-
-						
-
 
 							//for new seller balance(logged in user)
 							$user_balance = $user_balance + $order_quantity_temp*$buyer_price;
@@ -887,17 +978,6 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
 
 
-							//update shares_distribution table
-							$query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, -$order_quantity_temp), ($buyer_id, $company_id, $order_quantity_temp)";
-
-							if(mysqli_query($conn, $query_insert_shares_d))
-							{
-								echo "Shares distribution table updated<br>";
-							}
-							else
-								echo "Error inserting into shares_d table<br>";
-
-
 							//set the market price of the share to the price the transaction occurred
 							$market_price = $buyer_price;
 
@@ -927,10 +1007,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 					}
                 
             }
-            
-            
-            
-			
+            	
 		}
 		
 		//if market, start finding matches, execute partially / fully at the best price available
@@ -979,7 +1056,17 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 }
                                 else
                                     echo "Failed inserting transaction<br>";
-							}
+                                
+                                //update shares_distribution table
+                                $query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, -$order_quantity_temp), ($buyer_id, $company_id, $order_quantity_temp)";
+
+                                if(mysqli_query($conn, $query_insert_shares_d))
+                                {
+                                    echo "Shares distribution table updated<br>";
+                                }
+                                else
+                                    echo "Error inserting into shares_d table<br>";
+                            }
 
 							if($order_quantity_temp > $buyer_quantity)
 							{
@@ -1004,6 +1091,16 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 }
                                 else
                                     echo "Failed inserting transaction<br>";
+                                
+                                //update shares_distribution table
+                                $query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, -$buyer_quantity), ($buyer_id, $company_id, $buyer_quantity)";
+
+                                if(mysqli_query($conn, $query_insert_shares_d))
+                                {
+                                    echo "Shares distribution table updated<br>";
+                                }
+                                else
+                                    echo "Error inserting into shares_d table<br>";
 
 							}
 							elseif($order_quantity_temp < $buyer_quantity)
@@ -1033,10 +1130,18 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 }
                                 else
                                     echo "Failed inserting transaction<br>";
+                                
+                                //update shares_distribution table
+                                $query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, -$order_quantity_temp), ($buyer_id, $company_id, $order_quantity_temp)";
+
+                                if(mysqli_query($conn, $query_insert_shares_d))
+                                {
+                                    echo "Shares distribution table updated<br>";
+                                }
+                                else
+                                    echo "Error inserting into shares_d table<br>";
 
 							}
-						
-
 						
 
 
@@ -1094,17 +1199,6 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								echo "Failed adding entries in balances_of_users table<br>";
 							}
 
-
-
-							//update shares_distribution table
-							$query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, -$order_quantity_temp), ($buyer_id, $company_id, $order_quantity_temp)";
-
-							if(mysqli_query($conn, $query_insert_shares_d))
-							{
-								echo "Shares distribution table updated<br>";
-							}
-							else
-								echo "Error inserting into shares_d table<br>";
 
 
 							//set the market price of the share to the price the transaction occurred
@@ -1180,6 +1274,17 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 }
                                 else
                                     echo "Failed inserting transaction<br>";
+                                
+                                //update shares_distribution table
+                                $query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, -$order_quantity_temp), ($buyer_id, $company_id, $order_quantity_temp)";
+
+                                if(mysqli_query($conn, $query_insert_shares_d))
+                                {
+                                    echo "Shares distribution table updated<br>";
+                                }
+                                else
+                                    echo "Error inserting into shares_d table<br>";
+
 							}
 
 							if($order_quantity_temp > $buyer_quantity)
@@ -1205,6 +1310,17 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 }
                                 else
                                     echo "Failed inserting transaction<br>";
+                                
+                                //update shares_distribution table
+                                $query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, -$seller_quantity), ($buyer_id, $company_id, $seller_quantity)";
+
+                                if(mysqli_query($conn, $query_insert_shares_d))
+                                {
+                                    echo "Shares distribution table updated<br>";
+                                }
+                                else
+                                    echo "Error inserting into shares_d table<br>";
+
 
 							}
 							elseif($order_quantity_temp < $buyer_quantity)
@@ -1234,6 +1350,17 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
                                 }
                                 else
                                     echo "Failed inserting transaction<br>";
+                                
+                                //update shares_distribution table
+                                $query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, -$order_quantity_temp), ($buyer_id, $company_id, $order_quantity_temp)";
+
+                                if(mysqli_query($conn, $query_insert_shares_d))
+                                {
+                                    echo "Shares distribution table updated<br>";
+                                }
+                                else
+                                    echo "Error inserting into shares_d table<br>";
+
 
 							}
 						
@@ -1295,17 +1422,6 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								echo "Failed adding entries in balances_of_users table<br>";
 							}
 
-
-
-							//update shares_distribution table
-							$query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, -$order_quantity_temp), ($buyer_id, $company_id, $order_quantity_temp)";
-
-							if(mysqli_query($conn, $query_insert_shares_d))
-							{
-								echo "Shares distribution table updated<br>";
-							}
-							else
-								echo "Error inserting into shares_d table<br>";
 
 
 							//set the market price of the share to the price the transaction occurred

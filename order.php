@@ -95,24 +95,394 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 				exit();
 			}
 			
-			//add an entry in buying_orders
+			/*//add an entry in buying_orders
 
-			$query_insert_in_buy = "INSERT INTO buying_orders(company_id, user_id, no_of_shares, price) VALUES($company_id, $user_id, $order_quantity_temp, $limit_price)";
+			$query_insert_in_buy = "INSERT INTO buying_orders(company_id, user_id, no_of_shares, price, type) VALUES($company_id, $user_id, $order_quantity_temp, $limit_price, 'limit')";
 			if(mysqli_query($conn, $query_insert_in_buy))
 			{
 				echo "Limit order added in buying_orders table<br>";
 			}
 			else
-				echo "Failed adding in buying_orders for limit<br>";
+				echo "Failed adding in buying_orders for limit<br>";*/
 			
+            
+             //first check for market orders in selling_orders, directly execute them at limit price
+            $query_cmp_selling_table = "SELECT * FROM `selling_orders` WHERE company_id = $company_id AND type='market' ORDER BY no_of_shares DESC";
+			if($run_cmp_selling_table = mysqli_query($conn, $query_cmp_selling_table))
+			{
+                
+                if(mysqli_num_rows($run_cmp_selling_table) > 0)
+                while($array_sells = mysqli_fetch_assoc($run_cmp_selling_table))
+					{
+						$sell_order_id = $array_sells['id'];
+						$seller_id = $array_sells['user_id'];
+						$seller_price = $limit_price;
+						$seller_quantity = $array_sells['no_of_shares'];
+						
+						
+						if($user_id == $seller_id)
+						{
+							continue;
+						}
+
+                            if($order_quantity_temp == $seller_quantity)
+							{
+
+								//delete this row
+								$query_delete_row = "DELETE FROM selling_orders WHERE id=$sell_order_id";
+								if(mysqli_query($conn, $query_delete_row))
+								{
+									echo "Deleted row<br>";
+								}
+								$completely_executed = true;	
+                                
+                                //insert into transaction table
+                                $query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$seller_id','$user_id','$order_quantity_temp','$seller_price')";
+                                if(mysqli_query($conn, $query_transacation))
+                                {
+                                    //success
+                                    echo "Added into transactions<br>";
+                                }
+
+							}
+                        
+							if($order_quantity_temp > $seller_quantity)
+							{
+								//decrease the order_quantity occordingly
+								$order_quantity_temp = $order_quantity_temp - $seller_quantity;
+
+								//delete this row
+								$query_delete_row = "DELETE FROM selling_orders WHERE id=$sell_order_id";
+								if(mysqli_query($conn, $query_delete_row))
+								{
+									echo "deleted a row<br>";
+								}
+                                
+                                //insert into transaction table
+                                $query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$seller_id','$user_id','$seller_quantity','$seller_price')";
+                                if(mysqli_query($conn, $query_transacation))
+                                {
+                                    //success
+                                    echo "Added into transactions<br>";
+                                }
+
+
+							}
+							elseif($order_quantity_temp < $seller_quantity)
+							{
+								//update the quantity in this row
+								$seller_quantity = $seller_quantity - $order_quantity_temp;
+
+
+								$query_update_row = "UPDATE `selling_orders` SET `no_of_shares`= '$seller_quantity' WHERE id = $sell_order_id";
+								if(mysqli_query($conn, $query_update_row))
+								{
+									echo "updated shares quantity for seller<br>";
+								}
+
+								$completely_executed = true;	
+                                
+                                //insert into transaction table
+                                $query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$seller_id','$user_id','$order_quantity_temp','$seller_price')";
+                                if(mysqli_query($conn, $query_transacation))
+                                {
+                                    //success
+                                    echo "Added into transactions<br>";
+                                }
+
+							}
+							
+
+							
+
+
+							//for new buyer balance
+							$user_balance = $user_balance - $order_quantity_temp*$seller_price;
+
+							//update balance for the buyer(logged in user)
+							$query_update_balance1 = "UPDATE users SET balance = $user_balance WHERE id = $user_id";
+
+							if(mysqli_query($conn, $query_update_balance1))
+							{
+								echo "Updated balance for buyer<br>";
+							}
+							else
+								echo "Error updating buyer balance in users table";
+
+
+
+							//update balance for the seller if seller_id != -1
+							if($seller_id != -1)
+							{
+								$query_update_balance2 = "UPDATE users SET balance = balance + $order_quantity_temp*$seller_price WHERE id = $seller_id";
+
+								if(mysqli_query($conn, $query_update_balance2))
+								{
+									echo "updaed balance for seller<br>";
+								}
+								else
+									echo "Error updating seller balance in users table<br>";
+
+
+								//for new seller balance
+								//first fetch current balance for seller_id
+								$query_fetch_seller_balance  = "SELECT balance FROM users WHERE id = $seller_id";
+								if($run_seller_balance = mysqli_query($conn, $query_fetch_seller_balance))
+								{
+									while($array_seller_balance= mysqli_fetch_assoc($run_seller_balance))
+									{
+										$seller_balance = $array_seller_balance['balance'];
+									}
+								}	
+								$seller_balance = $seller_balance + $order_quantity_temp*$seller_price;
+
+
+								$query_update_balances_both = "INSERT INTO balances_of_users(user_id, balance) VALUES($user_id, $user_balance), ($seller_id, $seller_balance)";
+							}
+							else
+							{
+								$query_update_balances_both = "INSERT INTO balances_of_users(user_id, balance) VALUES($user_id, $user_balance)";
+							}
+
+
+							//add entries in balances_of_users table for changes in user balances
+							if(mysqli_query($conn, $query_update_balances_both))
+							{
+								echo "Updated balances of both<br>";
+							}
+							else
+							{
+								echo "Failed adding entries in balances_of_users table<br>";
+							}
+
+
+
+							//update shares_distribution table
+							$query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, $order_quantity_temp), ($seller_id, $company_id, -$order_quantity_temp)";
+
+							if(mysqli_query($conn, $query_insert_shares_d))
+							{
+								echo "Updated shares distibution table<br>";
+							}
+							else
+								echo "Error inserting into shares_d table<br>";
+
+
+
+							//set the market price of the share to the price the transaction occurred
+							$market_price = $seller_price;
+
+
+							
+							if($completely_executed)
+							{
+								echo "Completely executed.<br>";
+								exit();
+							}
+
+
+					}
+                    //if order is partially executed, insert the order into the buying_orders table
+					if(!$completely_executed)
+					{
+
+						//add an entry in buying_orders
+
+						$query_insert_in_buy = "INSERT INTO buying_orders(company_id, user_id, no_of_shares, price, type) VALUES($company_id, $user_id, $order_quantity_temp, $limit_price, 'limit')";
+						if(mysqli_query($conn, $query_insert_in_buy))
+						{
+							echo "Partial execution. Added entry into buying_orders<br>";
+						}
+					}
+            }
+            
+            
 		}
 		//if market, start finding matches, execute partially / fully at the best price available
 		elseif($type == "market")
 		
 		{
+            
+            //first check for market orders in selling_orders, directly execute them at current stock_price
+            $query_cmp_selling_table = "SELECT * FROM `selling_orders` WHERE company_id = $company_id AND type='market' ORDER BY no_of_shares DESC";
+			if($run_cmp_selling_table = mysqli_query($conn, $query_cmp_selling_table))
+			{
+                
+                if(mysqli_num_rows($run_cmp_selling_table) > 0)
+                while($array_sells = mysqli_fetch_assoc($run_cmp_selling_table))
+					{
+						$sell_order_id = $array_sells['id'];
+						$seller_id = $array_sells['user_id'];
+						$seller_price = $market_price;
+						$seller_quantity = $array_sells['no_of_shares'];
+						
+						
+						if($user_id == $seller_id)
+						{
+							continue;
+						}
+
+                            if($order_quantity_temp == $seller_quantity)
+							{
+
+								//delete this row
+								$query_delete_row = "DELETE FROM selling_orders WHERE id=$sell_order_id";
+								if(mysqli_query($conn, $query_delete_row))
+								{
+									echo "Deleted row<br>";
+								}
+								$completely_executed = true;	
+                                
+                                //insert into transaction table
+                                $query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$seller_id','$user_id','$order_quantity_temp','$seller_price')";
+                                if(mysqli_query($conn, $query_transacation))
+                                {
+                                    //success
+                                    echo "Added into transactions<br>";
+                                }
+
+							}
+                        
+							if($order_quantity_temp > $seller_quantity)
+							{
+								//decrease the order_quantity occordingly
+								$order_quantity_temp = $order_quantity_temp - $seller_quantity;
+
+								//delete this row
+								$query_delete_row = "DELETE FROM selling_orders WHERE id=$sell_order_id";
+								if(mysqli_query($conn, $query_delete_row))
+								{
+									echo "deleted a row<br>";
+								}
+                                
+                                //insert into transaction table
+                                $query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$seller_id','$user_id','$seller_quantity','$seller_price')";
+                                if(mysqli_query($conn, $query_transacation))
+                                {
+                                    //success
+                                    echo "Added into transactions<br>";
+                                }
+
+
+							}
+							elseif($order_quantity_temp < $seller_quantity)
+							{
+								//update the quantity in this row
+								$seller_quantity = $seller_quantity - $order_quantity_temp;
+
+
+								$query_update_row = "UPDATE `selling_orders` SET `no_of_shares`= '$seller_quantity' WHERE id = $sell_order_id";
+								if(mysqli_query($conn, $query_update_row))
+								{
+									echo "updated shares quantity for seller<br>";
+								}
+
+								$completely_executed = true;	
+                                
+                                //insert into transaction table
+                                $query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$seller_id','$user_id','$order_quantity_temp','$seller_price')";
+                                if(mysqli_query($conn, $query_transacation))
+                                {
+                                    //success
+                                    echo "Added into transactions<br>";
+                                }
+
+							}
+							
+
+							//for new buyer balance
+							$user_balance = $user_balance - $order_quantity_temp*$seller_price;
+
+							//update balance for the buyer(logged in user)
+							$query_update_balance1 = "UPDATE users SET balance = $user_balance WHERE id = $user_id";
+
+							if(mysqli_query($conn, $query_update_balance1))
+							{
+								echo "Updated balance for buyer<br>";
+							}
+							else
+								echo "Error updating buyer balance in users table";
+
+
+
+							//update balance for the seller if seller_id != -1
+							if($seller_id != -1)
+							{
+								$query_update_balance2 = "UPDATE users SET balance = balance + $order_quantity_temp*$seller_price WHERE id = $seller_id";
+
+								if(mysqli_query($conn, $query_update_balance2))
+								{
+									echo "updaed balance for seller<br>";
+								}
+								else
+									echo "Error updating seller balance in users table<br>";
+
+
+								//for new seller balance
+								//first fetch current balance for seller_id
+								$query_fetch_seller_balance  = "SELECT balance FROM users WHERE id = $seller_id";
+								if($run_seller_balance = mysqli_query($conn, $query_fetch_seller_balance))
+								{
+									while($array_seller_balance= mysqli_fetch_assoc($run_seller_balance))
+									{
+										$seller_balance = $array_seller_balance['balance'];
+									}
+								}	
+								$seller_balance = $seller_balance + $order_quantity_temp*$seller_price;
+
+
+								$query_update_balances_both = "INSERT INTO balances_of_users(user_id, balance) VALUES($user_id, $user_balance), ($seller_id, $seller_balance)";
+							}
+							else
+							{
+								$query_update_balances_both = "INSERT INTO balances_of_users(user_id, balance) VALUES($user_id, $user_balance)";
+							}
+
+
+							//add entries in balances_of_users table for changes in user balances
+							if(mysqli_query($conn, $query_update_balances_both))
+							{
+								echo "Updated balances of both<br>";
+							}
+							else
+							{
+								echo "Failed adding entries in balances_of_users table<br>";
+							}
+
+
+
+							//update shares_distribution table
+							$query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, $order_quantity_temp), ($seller_id, $company_id, -$order_quantity_temp)";
+
+							if(mysqli_query($conn, $query_insert_shares_d))
+							{
+								echo "Updated shares distibu table<br>";
+							}
+							else
+								echo "Error inserting into shares_d table<br>";
+
+
+
+							//set the market price of the share to the price the transaction occurred
+							$market_price = $seller_price;
+
+
+							
+							if($completely_executed)
+							{
+								echo "Completely executed.<br>";
+								exit();
+							}
+
+
+					}
+            
+                
+            }
+            
 		
 			//the selling_orders table needs to be sorted with lowest price and lowest time first before finding a match
-			$query_cmp_selling_table = "SELECT * FROM `selling_orders` WHERE company_id = $company_id ORDER BY price ASC";
+			$query_cmp_selling_table = "SELECT * FROM `selling_orders` WHERE company_id = $company_id AND type='limit' ORDER BY price ASC";
 			if($run_cmp_selling_table = mysqli_query($conn, $query_cmp_selling_table))
 			{
 				//if no entries in selling_orders table
@@ -120,7 +490,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 				{
 					//add an entry in buying_orders
 
-					$query_insert_in_buy = "INSERT INTO buying_orders(company_id, user_id, no_of_shares, price) VALUES($company_id, $user_id, $order_quantity_temp, $market_price)";
+					$query_insert_in_buy = "INSERT INTO buying_orders(company_id, user_id, no_of_shares, price, type) VALUES($company_id, $user_id, $order_quantity_temp, $market_price, 'market')";
 					if(mysqli_query($conn, $query_insert_in_buy))
 					{
 						echo "Inerted into buying_orders<br>";
@@ -141,6 +511,27 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 							continue;
 						}
 
+                            if($order_quantity_temp == $seller_quantity)
+							{
+
+								//delete this row
+								$query_delete_row = "DELETE FROM selling_orders WHERE id=$sell_order_id";
+								if(mysqli_query($conn, $query_delete_row))
+								{
+									echo "Deleted row<br>";
+								}
+								$completely_executed = true;	
+                                
+                                
+                                //insert into transaction table
+                                $query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$seller_id','$user_id','$order_quantity_temp','$seller_price')";
+                                if(mysqli_query($conn, $query_transacation))
+                                {
+                                    //success
+                                    echo "Added into transactions<br>";
+                                }
+							}
+                        
 							if($order_quantity_temp > $seller_quantity)
 							{
 								//decrease the order_quantity occordingly
@@ -152,9 +543,17 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								{
 									echo "deleted a row<br>";
 								}
+                                
+                                //insert into transaction table
+                                $query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$seller_id','$user_id','$seller_quantity','$seller_price')";
+                                if(mysqli_query($conn, $query_transacation))
+                                {
+                                    //success
+                                    echo "Added into transactions<br>";
+                                }
 
 							}
-							if($order_quantity_temp < $seller_quantity)
+							elseif($order_quantity_temp < $seller_quantity)
 							{
 								//update the quantity in this row
 								$seller_quantity = $seller_quantity - $order_quantity_temp;
@@ -167,28 +566,20 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								}
 
 								$completely_executed = true;	
+                                
+                                //insert into transaction table
+                                $query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$seller_id','$user_id','$order_quantity_temp','$seller_price')";
+                                if(mysqli_query($conn, $query_transacation))
+                                {
+                                    //success
+                                    echo "Added into transactions<br>";
+                                }
+
 
 							}
-							if($order_quantity_temp == $seller_quantity)
-							{
+							
 
-								//delete this row
-								$query_delete_row = "DELETE FROM selling_orders WHERE id=$sell_order_id";
-								if(mysqli_query($conn, $query_delete_row))
-								{
-									echo "Deleted row<br>";
-								}
-								$completely_executed = true;	
-							}
-
-							//insert into transaction table
-							$query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$seller_id','$user_id','$order_quantity_temp','$seller_price')";
-							if(mysqli_query($conn, $query_transacation))
-							{
-								//success
-								echo "Added into transactions<br>";
-							}
-
+							
 
 							//for new buyer balance
 							$user_balance = $user_balance - $order_quantity_temp*$seller_price;
@@ -282,7 +673,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
 						//add an entry in buying_orders
 
-						$query_insert_in_buy = "INSERT INTO buying_orders(company_id, user_id, no_of_shares, price) VALUES($company_id, $user_id, $order_quantity_temp, $market_price)";
+						$query_insert_in_buy = "INSERT INTO buying_orders(company_id, user_id, no_of_shares, price, type) VALUES($company_id, $user_id, $order_quantity_temp, $market_price, 'market')";
 						if(mysqli_query($conn, $query_insert_in_buy))
 						{
 							echo "Partial execution. Added entry into buying_orders<br>";
@@ -329,13 +720,216 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 			
 			//add an entry in selling_orders
 
-			$query_insert_in_sell = "INSERT INTO selling_orders(company_id, user_id, no_of_shares, price) VALUES($company_id, $user_id, $order_quantity_temp, $limit_price)";
+			/*$query_insert_in_sell = "INSERT INTO selling_orders(company_id, user_id, no_of_shares, price, type) VALUES($company_id, $user_id, $order_quantity_temp, $limit_price, 'limit')";
 			if(mysqli_query($conn, $query_insert_in_sell))
 			{
 				echo "Limit order added in selling_orders table<br>";
 			}
 			else
-				echo "Failed adding in selling_orders for limit<br>";
+				echo "Failed adding in selling_orders for limit<br>";*/
+            
+            
+            //first check for any market orders in buying_orders table, if found, directly execute at the limit price
+            $query_cmp_buying_table = "SELECT * FROM `buying_orders` WHERE company_id = $company_id AND type='market'";
+			if($run_cmp_buying_table = mysqli_query($conn, $query_cmp_buying_table))
+			{
+
+                while($array_buys = mysqli_fetch_assoc($run_cmp_buying_table))
+					{
+						$buy_order_id = $array_buys['id'];
+						$buyer_id = $array_buys['user_id'];
+						$buyer_price = $limit_price;
+						$buyer_quantity = $array_buys['no_of_shares'];
+						
+						
+						if($user_id == $buyer_id)
+						{
+							continue;
+						}
+                        
+                            if($order_quantity_temp == $buyer_quantity)
+							{
+
+								//delete this row
+								$query_delete_row = "DELETE FROM buying_orders WHERE id=$buy_order_id";
+								if(mysqli_query($conn, $query_delete_row))
+								{
+									echo "Deleted row from buying_orders<br>";
+								}
+								else
+									echo "Failed nb<br>";
+								$completely_executed = true;	
+                                
+                                //insert into transaction table
+                                $query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$user_id','$buyer_id','$order_quantity_temp','$buyer_price')";
+                                if(mysqli_query($conn, $query_transacation))
+                                {
+                                    //success
+                                    echo "Inerted into transactions<br>";
+
+                                }
+                                else
+                                    echo "Failed inserting transaction<br>";
+							}
+
+							if($order_quantity_temp > $buyer_quantity)
+							{
+								//decrease the order_quantity occordingly
+								$order_quantity_temp = $order_quantity_temp - $buyer_quantity;
+
+								//delete this row
+								$query_delete_row = "DELETE FROM buying_orders WHERE id=$buy_order_id";
+								if(mysqli_query($conn, $query_delete_row))
+								{
+									echo "Deleted row from buying_orders.<br>";
+								}
+                                
+                                
+                                //insert into transaction table
+                                $query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$user_id','$buyer_id','$buyer_quantity','$buyer_price')";
+                                if(mysqli_query($conn, $query_transacation))
+                                {
+                                    //success
+                                    echo "Inerted into transactions<br>";
+
+                                }
+                                else
+                                    echo "Failed inserting transaction<br>";
+
+							}
+							elseif($order_quantity_temp < $buyer_quantity)
+							{
+								//update the quantity in this row
+								$buyer_quantity = $buyer_quantity - $order_quantity_temp;
+
+
+								$query_update_row = "UPDATE `buying_orders` SET `no_of_shares`= '$buyer_quantity' WHERE id = $buy_order_id";
+								if(mysqli_query($conn, $query_update_row))
+								{
+									echo "Updated shares quantity for a row<br>";
+								}	
+								else
+									echo "Failes a";
+
+								$completely_executed = true;	
+                                
+                                
+                                //insert into transaction table
+                                $query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$user_id','$buyer_id','$order_quantity_temp','$buyer_price')";
+                                if(mysqli_query($conn, $query_transacation))
+                                {
+                                    //success
+                                    echo "Inerted into transactions<br>";
+
+                                }
+                                else
+                                    echo "Failed inserting transaction<br>";
+
+							}
+						
+
+						
+
+
+							//for new seller balance(logged in user)
+							$user_balance = $user_balance + $order_quantity_temp*$buyer_price;
+
+							//update balance for the seller(logged in user)
+							$query_update_balance1 = "UPDATE users SET balance = $user_balance WHERE id = $user_id";
+
+							if(mysqli_query($conn, $query_update_balance1))
+							{
+								echo "Balance updated for seller<br>";
+							}
+							else
+								echo "Error updating seller balance in users table<br>";
+
+
+
+							//update balance for the buyer
+							
+								$query_update_balance2 = "UPDATE users SET balance = balance - $order_quantity_temp*$buyer_price WHERE id = $buyer_id";
+
+								if(mysqli_query($conn, $query_update_balance2))
+								{
+									echo "Balancec updated for buyer<br>";
+								}
+								else
+									echo "Error updating buyer balance in users table<br>";
+
+
+								//for new buyer balance
+								//first fetch current balance for buyer_id
+								$query_fetch_buyer_balance  = "SELECT balance FROM users WHERE id = $buyer_id";
+								if($run_buyer_balance = mysqli_query($conn, $query_fetch_buyer_balance))
+								{
+									while($array_buyer_balance= mysqli_fetch_assoc($run_buyer_balance))
+									{
+										$buyer_balance = $array_buyer_balance['balance'];
+									}
+								}
+						else
+							echo "gas";
+								$buyer_balance = $buyer_balance - $order_quantity_temp*$buyer_price;
+
+
+								$query_update_balances_both = "INSERT INTO balances_of_users(user_id, balance) VALUES($user_id, $user_balance), ($buyer_id, $buyer_balance)";
+							
+							//add entries in balances_of_users table for changes in user balances
+							if(mysqli_query($conn, $query_update_balances_both))
+							{
+								echo "Balance updated for both<br>";
+							}
+							else
+							{
+								echo "Failed adding entries in balances_of_users table<br>";
+							}
+
+
+
+							//update shares_distribution table
+							$query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, -$order_quantity_temp), ($buyer_id, $company_id, $order_quantity_temp)";
+
+							if(mysqli_query($conn, $query_insert_shares_d))
+							{
+								echo "Shares distribution table updated<br>";
+							}
+							else
+								echo "Error inserting into shares_d table<br>";
+
+
+							//set the market price of the share to the price the transaction occurred
+							$market_price = $buyer_price;
+
+
+							
+							if($completely_executed)
+							{
+								echo "Completely executed.<br>";
+								exit;
+							}
+
+
+					}
+                    //if order is partially executed, insert the order into the buying_orders table
+					if(!$completely_executed)
+					{
+
+						//add an entry in selling_orders
+
+						$query_insert_in_sell = "INSERT INTO selling_orders(company_id, user_id, no_of_shares, price, type) VALUES($company_id, $user_id, $order_quantity_temp, $limit_price, 'limit')";
+						if(mysqli_query($conn, $query_insert_in_sell))
+						{
+							echo "Added partial entry in selling_orders<br>";
+						}
+						else
+							echo "Error insert in sell for market<br>";
+					}
+                
+            }
+            
+            
+            
 			
 		}
 		
@@ -343,9 +937,196 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 		elseif($type == "market")
 		
 		{
+            
+            //first check for any market orders in buying_orders table, if found, directly execute at the current stock_price
+            $query_cmp_buying_table = "SELECT * FROM `buying_orders` WHERE company_id = $company_id AND type='market'";
+			if($run_cmp_buying_table = mysqli_query($conn, $query_cmp_buying_table))
+			{
+
+                while($array_buys = mysqli_fetch_assoc($run_cmp_buying_table))
+					{
+						$buy_order_id = $array_buys['id'];
+						$buyer_id = $array_buys['user_id'];
+						$buyer_price = $market_price;
+						$buyer_quantity = $array_buys['no_of_shares'];
+						
+						
+						if($user_id == $buyer_id)
+						{
+							continue;
+						}
+                        
+                            if($order_quantity_temp == $buyer_quantity)
+							{
+
+								//delete this row
+								$query_delete_row = "DELETE FROM buying_orders WHERE id=$buy_order_id";
+								if(mysqli_query($conn, $query_delete_row))
+								{
+									echo "Deleted row from buying_orders<br>";
+								}
+								else
+									echo "Failed nb<br>";
+								$completely_executed = true;	
+                                
+                                //insert into transaction table
+                                $query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$user_id','$buyer_id','$order_quantity_temp','$buyer_price')";
+                                if(mysqli_query($conn, $query_transacation))
+                                {
+                                    //success
+                                    echo "Inerted into transactions<br>";
+
+                                }
+                                else
+                                    echo "Failed inserting transaction<br>";
+							}
+
+							if($order_quantity_temp > $buyer_quantity)
+							{
+								//decrease the order_quantity occordingly
+								$order_quantity_temp = $order_quantity_temp - $buyer_quantity;
+
+								//delete this row
+								$query_delete_row = "DELETE FROM buying_orders WHERE id=$buy_order_id";
+								if(mysqli_query($conn, $query_delete_row))
+								{
+									echo "Deleted row from buying_orders.<br>";
+								}
+                                
+                                
+                                //insert into transaction table
+                                $query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$user_id','$buyer_id','$buyer_quantity','$buyer_price')";
+                                if(mysqli_query($conn, $query_transacation))
+                                {
+                                    //success
+                                    echo "Inerted into transactions<br>";
+
+                                }
+                                else
+                                    echo "Failed inserting transaction<br>";
+
+							}
+							elseif($order_quantity_temp < $buyer_quantity)
+							{
+								//update the quantity in this row
+								$buyer_quantity = $buyer_quantity - $order_quantity_temp;
+
+
+								$query_update_row = "UPDATE `buying_orders` SET `no_of_shares`= '$buyer_quantity' WHERE id = $buy_order_id";
+								if(mysqli_query($conn, $query_update_row))
+								{
+									echo "Updated shares quantity for a row<br>";
+								}	
+								else
+									echo "Failes a";
+
+								$completely_executed = true;	
+                                
+                                
+                                //insert into transaction table
+                                $query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$user_id','$buyer_id','$order_quantity_temp','$buyer_price')";
+                                if(mysqli_query($conn, $query_transacation))
+                                {
+                                    //success
+                                    echo "Inerted into transactions<br>";
+
+                                }
+                                else
+                                    echo "Failed inserting transaction<br>";
+
+							}
+						
+
+						
+
+
+							//for new seller balance(logged in user)
+							$user_balance = $user_balance + $order_quantity_temp*$buyer_price;
+
+							//update balance for the seller(logged in user)
+							$query_update_balance1 = "UPDATE users SET balance = $user_balance WHERE id = $user_id";
+
+							if(mysqli_query($conn, $query_update_balance1))
+							{
+								echo "Balance updated for seller<br>";
+							}
+							else
+								echo "Error updating seller balance in users table<br>";
+
+
+
+							//update balance for the buyer
+							
+								$query_update_balance2 = "UPDATE users SET balance = balance - $order_quantity_temp*$buyer_price WHERE id = $buyer_id";
+
+								if(mysqli_query($conn, $query_update_balance2))
+								{
+									echo "Balancec updated for buyer<br>";
+								}
+								else
+									echo "Error updating buyer balance in users table<br>";
+
+
+								//for new buyer balance
+								//first fetch current balance for buyer_id
+								$query_fetch_buyer_balance  = "SELECT balance FROM users WHERE id = $buyer_id";
+								if($run_buyer_balance = mysqli_query($conn, $query_fetch_buyer_balance))
+								{
+									while($array_buyer_balance= mysqli_fetch_assoc($run_buyer_balance))
+									{
+										$buyer_balance = $array_buyer_balance['balance'];
+									}
+								}
+						else
+							echo "gas";
+								$buyer_balance = $buyer_balance - $order_quantity_temp*$buyer_price;
+
+
+								$query_update_balances_both = "INSERT INTO balances_of_users(user_id, balance) VALUES($user_id, $user_balance), ($buyer_id, $buyer_balance)";
+							
+							//add entries in balances_of_users table for changes in user balances
+							if(mysqli_query($conn, $query_update_balances_both))
+							{
+								echo "Balance updated for both<br>";
+							}
+							else
+							{
+								echo "Failed adding entries in balances_of_users table<br>";
+							}
+
+
+
+							//update shares_distribution table
+							$query_insert_shares_d = "INSERT INTO shares_distribution(user_id, company_id, no_of_shares) VALUES($user_id, $company_id, -$order_quantity_temp), ($buyer_id, $company_id, $order_quantity_temp)";
+
+							if(mysqli_query($conn, $query_insert_shares_d))
+							{
+								echo "Shares distribution table updated<br>";
+							}
+							else
+								echo "Error inserting into shares_d table<br>";
+
+
+							//set the market price of the share to the price the transaction occurred
+							$market_price = $buyer_price;
+
+
+							
+							if($completely_executed)
+							{
+								echo "Completely executed.<br>";
+								exit;
+							}
+
+
+					}
+                
+            }
+            
+            
 		
 			//the buying_orders table needs to be sorted with highest price and lowest time first before finding a match
-			$query_cmp_buying_table = "SELECT * FROM `buying_orders` WHERE company_id = $company_id ORDER BY price DESC";
+			$query_cmp_buying_table = "SELECT * FROM `buying_orders` WHERE company_id = $company_id AND type='limit' ORDER BY price DESC";
 			if($run_cmp_buying_table = mysqli_query($conn, $query_cmp_buying_table))
 			{
 				//if no entries in buying_orders table
@@ -353,7 +1134,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 				{
 					//add an entry in selling_orders
 
-					$query_insert_in_sell = "INSERT INTO selling_orders(company_id, user_id, no_of_shares, price) VALUES($company_id, $user_id, $order_quantity_temp, $market_price)";
+					$query_insert_in_sell = "INSERT INTO selling_orders(company_id, user_id, no_of_shares, price, type) VALUES($company_id, $user_id, $order_quantity_temp, $market_price, 'market')";
 					if(mysqli_query($conn, $query_insert_in_sell))
 					{
 						echo "Market order added in selling_orders table<br>";
@@ -375,6 +1156,31 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 						{
 							continue;
 						}
+                        
+                            if($order_quantity_temp == $buyer_quantity)
+							{
+
+								//delete this row
+								$query_delete_row = "DELETE FROM buying_orders WHERE id=$buy_order_id";
+								if(mysqli_query($conn, $query_delete_row))
+								{
+									echo "Deleted row from buying_orders<br>";
+								}
+								else
+									echo "Failed nb<br>";
+								$completely_executed = true;	
+                                
+                                //insert into transaction table
+                                $query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$user_id','$buyer_id','$order_quantity_temp','$buyer_price')";
+                                if(mysqli_query($conn, $query_transacation))
+                                {
+                                    //success
+                                    echo "Inerted into transactions<br>";
+
+                                }
+                                else
+                                    echo "Failed inserting transaction<br>";
+							}
 
 							if($order_quantity_temp > $buyer_quantity)
 							{
@@ -387,9 +1193,21 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 								{
 									echo "Deleted row from buying_orders.<br>";
 								}
+                                
+                                
+                                //insert into transaction table
+                                $query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$user_id','$buyer_id','$seller_quantity','$buyer_price')";
+                                if(mysqli_query($conn, $query_transacation))
+                                {
+                                    //success
+                                    echo "Inerted into transactions<br>";
+
+                                }
+                                else
+                                    echo "Failed inserting transaction<br>";
 
 							}
-							if($order_quantity_temp < $buyer_quantity)
+							elseif($order_quantity_temp < $buyer_quantity)
 							{
 								//update the quantity in this row
 								$buyer_quantity = $buyer_quantity - $order_quantity_temp;
@@ -404,32 +1222,22 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 									echo "Failes a";
 
 								$completely_executed = true;	
+                                
+                                
+                                //insert into transaction table
+                                $query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$user_id','$buyer_id','$order_quantity_temp','$buyer_price')";
+                                if(mysqli_query($conn, $query_transacation))
+                                {
+                                    //success
+                                    echo "Inerted into transactions<br>";
+
+                                }
+                                else
+                                    echo "Failed inserting transaction<br>";
 
 							}
-							if($order_quantity_temp == $buyer_quantity)
-							{
+						
 
-								//delete this row
-								$query_delete_row = "DELETE FROM buying_orders WHERE id=$buy_order_id";
-								if(mysqli_query($conn, $query_delete_row))
-								{
-									echo "Deleted row from buying_orders<br>";
-								}
-								else
-									echo "Failed nb<br>";
-								$completely_executed = true;	
-							}
-
-							//insert into transaction table
-							$query_transacation = "INSERT INTO transactions(company_id, seller_id, buyer_id, no_of_shares, price) VALUES('$company_id','$user_id','$buyer_id','$order_quantity_temp','$buyer_price')";
-							if(mysqli_query($conn, $query_transacation))
-							{
-								//success
-								echo "Inerted into transactions<br>";
-								
-							}
-						else
-							echo "Ruyiyi<br>";
 						
 
 
@@ -519,7 +1327,7 @@ if(isset($_POST['order']) && isset($_POST['company']) && isset($_POST['shares'])
 
 						//add an entry in selling_orders
 
-						$query_insert_in_sell = "INSERT INTO selling_orders(company_id, user_id, no_of_shares, price) VALUES($company_id, $user_id, $order_quantity_temp, $market_price)";
+						$query_insert_in_sell = "INSERT INTO selling_orders(company_id, user_id, no_of_shares, price, type) VALUES($company_id, $user_id, $order_quantity_temp, $market_price, 'market')";
 						if(mysqli_query($conn, $query_insert_in_sell))
 						{
 							echo "Added partial entry in selling_orders<br>";

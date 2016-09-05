@@ -196,7 +196,7 @@ if(isset($_POST['company_name']) && isset($_POST['abbr']) && isset($_POST['descr
 		
 		//3. Now insert into the 'selling_orders' table
 //IMP	  user_id kept as -1 because these shares will be sold directly by the company and not by another user
-		$query_new_company3 = "INSERT INTO selling_orders(company_id, user_id, price, no_of_shares) VALUES('$company_id','-1','$initial_price_share','$initial_no_of_shares')";
+		$query_new_company3 = "INSERT INTO selling_orders(company_id, user_id, price, no_of_shares, type) VALUES('$company_id','-1','$initial_price_share','$initial_no_of_shares', 'limit')";
 		if(mysqli_query($conn, $query_new_company3))
 		{
 			//success
